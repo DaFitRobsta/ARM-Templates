@@ -1,0 +1,1 @@
+Store all of my ARM template developments.
