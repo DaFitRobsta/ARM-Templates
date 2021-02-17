@@ -15,16 +15,16 @@
     },
     "localGatewayName": {
       "type": "string",
-      "defaultValue": "odot-test-eis-lng01",
+      "defaultValue": "ol-slm-lng01",
       "metadata": {
         "description": "Arbitrary name for gateway resource representing "
       }
     },
     "localGatewayIpAddress": {
       "type": "string",
-      "defaultValue": "159.121.123.225",
+      "defaultValue": "159.121.166.99",
       "metadata": {
-        "description": "Public IP of your CSS/EIS Cisco ISR1000 Router"
+        "description": "Public IP of your CheckPoint Firewall"
       }
     },
     "localAddressPrefix": {
@@ -41,37 +41,51 @@
     },
     "virtualNetworkName": {
       "type": "string",
-      "defaultValue": "odot-test-vpn-vnet01",
+      "defaultValue": "ol-hub-vnet01",
       "metadata": {
         "description": "Arbitrary name for the Azure Virtual Network"
       }
     },
     "azureVNetAddressPrefix": {
       "type": "string",
-      "defaultValue": "10.22.96.0/24",
+      "defaultValue": "10.35.26.0/24",
       "metadata": {
-        "description": "CIDR block representing the address space of the Azure VNet"
+        "description": "CIDR block representing the address space of the Azure Hub VNet"
       }
     },
-    "subnetName": {
+    "bastionSubnetPrefix": {
       "type": "string",
-      "defaultValue": "VM-test-subnet",
+      "defaultValue": "10.35.26.0/27",
       "metadata": {
-        "description": "Arbitrary name for the Azure Subnet"
-      }
-    },
-    "subnetPrefix": {
-      "type": "string",
-      "defaultValue": "10.22.96.128/25",
-      "metadata": {
-        "description": "CIDR block for VM subnet, subset of azureVNetAddressPrefix address space"
+        "description": "CIDR block for Azure Bastion subnet, subset of azureVNetAddressPrefix address space"
       }
     },
     "gatewaySubnetPrefix": {
       "type": "string",
-      "defaultValue": "10.22.96.0/27",
+      "defaultValue": "10.35.26.32/27",
       "metadata": {
         "description": "CIDR block for gateway subnet, subset of azureVNetAddressPrefix address space"
+      }
+    },    
+    "firewallSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.35.26.64/26",
+      "metadata": {
+        "description": "CIDR block for Azure Firewall subnet, subset of azureVNetAddressPrefix address space"
+      }
+    },        
+    "sharedServicesSubnetName": {
+      "type": "string",
+      "defaultValue": "shared-services-sn",
+      "metadata": {
+        "description": "Arbitrary name for the Shared Services Subnet"
+      }
+    },
+    "sharedServicesSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.35.26.128/26",
+      "metadata": {
+        "description": "CIDR block for Shared Services subnet, subset of azureVNetAddressPrefix address space"
       }
     },
     "gatewayPublicIPName": {
@@ -92,6 +106,7 @@
       "type": "string",
       "defaultValue": "VpnGw2",
       "allowedValues": [
+        "VpnGw1",
         "VpnGw2",
         "VpnGw3",
         "VpnGw4",
@@ -114,7 +129,7 @@
     },
     "connectionName": {
       "type": "string",
-      "defaultValue": "odot-2-eis",
+      "defaultValue": "ol-hub-to-slm",
       "metadata": {
         "description": "Arbitrary name for the new connection between Azure VNet and other network"
       }
@@ -176,15 +191,27 @@
         },
         "subnets": [
           {
-            "name": "[parameters('subnetName')]",
+            "name": "[parameters('sharedServicesSubnetName')]",
             "properties": {
-              "addressPrefix": "[parameters('subnetPrefix')]"
+              "addressPrefix": "[parameters('sharedServicesSubnetPrefix')]"
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties":{
+              "addressPrefix": "[parameters('bastionSubnetPrefix')]"
             }
           },
           {
             "name": "GatewaySubnet",
             "properties": {
               "addressPrefix": "[parameters('gatewaySubnetPrefix')]"
+            }
+          },
+          {
+            "name":"AzureFirewallSubnet",
+            "properties": {
+              "addressPrefix":"[parameters('firewallSubnetPrefix')]"
             }
           }
         ]

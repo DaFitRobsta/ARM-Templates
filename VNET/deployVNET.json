@@ -1,0 +1,97 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "ol-hub-vnet01",
+      "metadata": {
+        "description": "Arbitrary name for the Azure Virtual Network"
+      }
+    },
+    "azureVNetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.35.26.0/24",
+      "metadata": {
+        "description": "CIDR block representing the address space of the Azure Hub VNet"
+      }
+    },
+    "bastionSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.35.26.0/27",
+      "metadata": {
+        "description": "CIDR block for Azure Bastion subnet, subset of azureVNetAddressPrefix address space"
+      }
+    },
+    "gatewaySubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.35.26.32/27",
+      "metadata": {
+        "description": "CIDR block for gateway subnet, subset of azureVNetAddressPrefix address space"
+      }
+    },    
+    "firewallSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.35.26.64/26",
+      "metadata": {
+        "description": "CIDR block for Azure Firewall subnet, subset of azureVNetAddressPrefix address space"
+      }
+    },        
+    "sharedServicesSubnetName": {
+      "type": "string",
+      "defaultValue": "shared-services-sn",
+      "metadata": {
+        "description": "Arbitrary name for the Shared Services Subnet"
+      }
+    },
+    "sharedServicesSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.35.26.128/26",
+      "metadata": {
+        "description": "CIDR block for Shared Services subnet, subset of azureVNetAddressPrefix address space"
+      }
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "apiVersion": "2020-04-01",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworkName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('azureVNetAddressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('sharedServicesSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('sharedServicesSubnetPrefix')]"
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties":{
+              "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+            }
+          },
+          {
+            "name": "GatewaySubnet",
+            "properties": {
+              "addressPrefix": "[parameters('gatewaySubnetPrefix')]"
+            }
+          },
+          {
+            "name":"AzureFirewallSubnet",
+            "properties": {
+              "addressPrefix":"[parameters('firewallSubnetPrefix')]"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
