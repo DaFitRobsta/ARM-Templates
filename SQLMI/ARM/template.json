@@ -1,0 +1,320 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vulnerabilityAssessments_Default_storageContainerPath": {
+            "type": "SecureString"
+        },
+        "managedInstances_ois_drm_dev_gaz_sqlmi_01_name": {
+            "defaultValue": "ois-drm-dev-gaz-sqlmi-01",
+            "type": "String"
+        },
+        "servers_ois_drm_dev_gaz_sqlmi_01_name": {
+            "defaultValue": "ois-drm-dev-gaz-sqlmi-01",
+            "type": "String"
+        },
+        "virtualNetworks_VN_OIS_DRM_SQL_DEV01_externalid": {
+            "defaultValue": "/subscriptions/d160210d-1ae7-42f0-a991-e084fd5fbf74/resourceGroups/RG-SDC-NETWORK-OIS-DRM-SQL-DEV01/providers/Microsoft.Network/virtualNetworks/VN-OIS-DRM-SQL-DEV01",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Sql/managedInstances",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name')]",
+            "location": "usgovarizona",
+            "sku": {
+                "name": "GP_Gen5",
+                "tier": "GeneralPurpose",
+                "family": "Gen5",
+                "capacity": 4
+            },
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "administratorLogin": "drmsqladmin",
+                "subnetId": "[concat(parameters('virtualNetworks_VN_OIS_DRM_SQL_DEV01_externalid'), '/subnets/SN-OIS-DRM-SQLMI-DEV01')]",
+                "licenseType": "BasePrice",
+                "vCores": 4,
+                "storageSizeInGB": 2048,
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "publicDataEndpointEnabled": false,
+                "proxyOverride": "Redirect",
+                "timezoneId": "Pacific Standard Time",
+                "maintenanceConfigurationId": "/subscriptions/d160210d-1ae7-42f0-a991-e084fd5fbf74/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
+                "minimalTlsVersion": "1.2",
+                "storageAccountType": "LRS",
+                "zoneRedundant": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('servers_ois_drm_dev_gaz_sqlmi_01_name'), '/DRMDW/Default')]",
+            "properties": {
+                "recurringScans": {
+                    "isEnabled": false,
+                    "emailSubscriptionAdmins": true
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('servers_ois_drm_dev_gaz_sqlmi_01_name'), '/forGary/Default')]",
+            "properties": {
+                "recurringScans": {
+                    "isEnabled": false,
+                    "emailSubscriptionAdmins": true
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('servers_ois_drm_dev_gaz_sqlmi_01_name'), '/OMS_Growsites_ASQLMI/Default')]",
+            "properties": {
+                "recurringScans": {
+                    "isEnabled": false,
+                    "emailSubscriptionAdmins": true
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/administrators",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/ActiveDirectory')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "administratorType": "ActiveDirectory",
+                "login": "Role - OIS - DRM-SQL-DEV01 - Contributor",
+                "sid": "3c031d9a-2197-4b7d-a6d3-87df32e4d9a9",
+                "tenantId": "a276ba90-5ec5-4241-baf6-ec133094cae9"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/azureADOnlyAuthentications",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "azureADOnlyAuthentication": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/databases",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/DRMDW')]",
+            "location": "usgovarizona",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/databases",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/forGary')]",
+            "location": "usgovarizona",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/databases",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/OMS_Growsites_ASQLMI')]",
+            "location": "usgovarizona",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/encryptionProtector",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/current')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "kind": "servicemanaged",
+            "properties": {
+                "serverKeyName": "ServiceManaged",
+                "serverKeyType": "ServiceManaged",
+                "autoRotationEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/keys",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/ServiceManaged')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "kind": "servicemanaged",
+            "properties": {
+                "serverKeyType": "ServiceManaged"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/securityAlertPolicies",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/vulnerabilityAssessments",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "recurringScans": {
+                    "isEnabled": false,
+                    "emailSubscriptionAdmins": true
+                },
+                "storageContainerPath": "[parameters('vulnerabilityAssessments_Default_storageContainerPath')]"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/databases/backupShortTermRetentionPolicies",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/DRMDW/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances/databases', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), 'DRMDW')]",
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 7
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/databases/backupShortTermRetentionPolicies",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/forGary/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances/databases', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), 'forGary')]",
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 7
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/databases/backupShortTermRetentionPolicies",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/OMS_Growsites_ASQLMI/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances/databases', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), 'OMS_Growsites_ASQLMI')]",
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 7
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/databases/securityAlertPolicies",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/DRMDW/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances/databases', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), 'DRMDW')]",
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": false,
+                "retentionDays": 0
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/databases/securityAlertPolicies",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/forGary/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances/databases', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), 'forGary')]",
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": false,
+                "retentionDays": 0
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/databases/securityAlertPolicies",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/OMS_Growsites_ASQLMI/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances/databases', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), 'OMS_Growsites_ASQLMI')]",
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": false,
+                "retentionDays": 0
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/databases/transparentDataEncryption",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/forGary/Current')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances/databases', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), 'forGary')]",
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/managedInstances/databases/transparentDataEncryption",
+            "apiVersion": "2020-08-01-preview",
+            "name": "[concat(parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), '/OMS_Growsites_ASQLMI/Current')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/managedInstances/databases', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'), 'OMS_Growsites_ASQLMI')]",
+                "[resourceId('Microsoft.Sql/managedInstances', parameters('managedInstances_ois_drm_dev_gaz_sqlmi_01_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled"
+            }
+        }
+    ]
+}

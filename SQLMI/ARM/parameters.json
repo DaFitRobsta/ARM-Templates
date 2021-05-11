@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vulnerabilityAssessments_Default_storageContainerPath": {
+            "value": null
+        },
+        "managedInstances_ois_drm_dev_gaz_sqlmi_01_name": {
+            "value": null
+        },
+        "servers_ois_drm_dev_gaz_sqlmi_01_name": {
+            "value": null
+        },
+        "virtualNetworks_VN_OIS_DRM_SQL_DEV01_externalid": {
+            "value": null
+        }
+    }
+}
