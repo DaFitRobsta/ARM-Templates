@@ -52,7 +52,7 @@ param sqlManagedInstanceStorageSizeInGB int = 32
   80
 ])
 @description('The number of vCores. Allowed values: 4, 8, 16, 24, 32, 40, 64, 80.')
-param sqlManagedInstancevCores int = '4'
+param sqlManagedInstancevCores int = 4
 
 @allowed([
   'BasePrice'
