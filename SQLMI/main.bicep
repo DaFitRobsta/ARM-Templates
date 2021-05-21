@@ -84,6 +84,7 @@ param sqlManagedInstanceProxyOverride string = 'Redirect'
 @description('Tags for the Managed Instance SQL resource.')
 param sqlManagedInstanceTags object = {}
 
+// Referencing an existing Virtual Network
 resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
   name: vnetResourceName
 }

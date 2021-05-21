@@ -68,7 +68,22 @@ param adRulesSourceAddresses array = []
 @description('List of Source AD DS Server IP Group(s) - comma seperated quoted IP Groups ID(s)')
 param adRulesSourceIPGroups array = []
 
-module adRulesCollection 'RuleGroups/activeDirectoryRG.bicep' = if (((!empty(adRulesDestinationAddresses) && empty(adRulesDestinationIPGroups)) || (empty(adRulesDestinationAddresses) && !empty(adRulesDestinationIPGroups))) && ((!empty(adRulesSourceAddresses) && empty(adRulesSourceIPGroups)) || (empty(adRulesSourceAddresses) && !empty(adRulesSourceIPGroups))))  {
+@description('For the Core Systems Rules, set the destination addresses in comma seperated quoted IP addresses')
+param coreSysRulesDestinationAddresses array = []
+
+@description('For the Core Systems Rules, set the destination IP Groups resource Id in comma seperated quoted IDs')
+param coreSysRulesDestinationIPGroups array = []
+
+@description('For the Core Systems Rules, set the source addresses in comma seperated quoted IP addresses')
+param coreSysRulesSourceAddresses array = []
+
+@description('For the Core Systems Rules, set the source IP Groups resource Id in comma seperated quoted IDs')
+param coreSysRulesSourceIPGroups array = []
+
+@description('Priority of the AD Rule Collection Group')
+param coreRuleCollectionGroupPriority int = 100
+
+module adRulesCollection 'RuleGroups/coreInfraRCG.bicep' = if (((!empty(adRulesDestinationAddresses) && empty(adRulesDestinationIPGroups)) || (empty(adRulesDestinationAddresses) && !empty(adRulesDestinationIPGroups))) && ((!empty(adRulesSourceAddresses) && empty(adRulesSourceIPGroups)) || (empty(adRulesSourceAddresses) && !empty(adRulesSourceIPGroups))))  {
   name: 'adRulesCollectionDeploy'
   params:{
     fwPolicyName: policyName
@@ -76,6 +91,11 @@ module adRulesCollection 'RuleGroups/activeDirectoryRG.bicep' = if (((!empty(adR
     adRulesDestinationIPGroups: empty(adRulesDestinationIPGroups) ? [] : adRulesDestinationIPGroups
     adRulesSourceAddresses: empty(adRulesSourceAddresses) ? [] : adRulesSourceAddresses
     adRulesSourceIPGroups: empty(adRulesSourceIPGroups) ? [] : adRulesSourceIPGroups
+    coreSysRulesDestinationAddresses: empty(coreSysRulesDestinationAddresses) ? [] : coreSysRulesDestinationAddresses
+    coreSysRulesDestinationIPGroups: empty(coreSysRulesDestinationIPGroups) ? [] : coreSysRulesDestinationIPGroups
+    coreSysRulesSourceAddresses: empty(coreSysRulesSourceAddresses) ? [] : coreSysRulesSourceAddresses
+    coreSysRulesSourceIPGroups: empty(coreSysRulesSourceIPGroups) ? [] : coreSysRulesSourceIPGroups
+    coreRuleCollectionGroupPriority: coreRuleCollectionGroupPriority
   }
   dependsOn:[
     baseFwPolicy

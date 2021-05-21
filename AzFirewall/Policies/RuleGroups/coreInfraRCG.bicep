@@ -14,14 +14,34 @@ param adRulesSourceAddresses array = []
 @description('For the AD Rules, set the source IP Groups resource Id in comma seperated quoted IDs')
 param adRulesSourceIPGroups array = []
 
-resource adRulesGroupCollection 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2020-11-01' = {
-  name: '${fwPolicyName}/ActiveDirectoryRulesCollectionGroup'
+@description('For the Core Systems Rules, set the destination addresses in comma seperated quoted IP addresses')
+param coreSysRulesDestinationAddresses array = []
+
+@description('For the Core Systems Rules, set the destination IP Groups resource Id in comma seperated quoted IDs')
+param coreSysRulesDestinationIPGroups array = []
+
+@description('For the Core Systems Rules, set the source addresses in comma seperated quoted IP addresses')
+param coreSysRulesSourceAddresses array = []
+
+@description('For the Core Systems Rules, set the source IP Groups resource Id in comma seperated quoted IDs')
+param coreSysRulesSourceIPGroups array = []
+
+@description('Priority of the AD Rule Collection Group')
+param coreRuleCollectionGroupPriority int = 100
+
+// Set the Rules Collection Priority
+var adRulesPriority = 100
+var coreSystemsRulesPriority = 105
+var coreSystemsApplicationRulesPriority = 110
+
+resource coreInfraRulesGroupCollection 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2020-11-01' = {
+  name: '${fwPolicyName}/CoreInfrastructureRulesCollectionGroup'
   properties:{
-    priority: 110
+    priority: coreRuleCollectionGroupPriority
     ruleCollections:[
       {
         name: 'ActiveDirectoryRules'
-        priority: 100
+        priority: adRulesPriority
         ruleCollectionType:'FirewallPolicyFilterRuleCollection'
         action:{
           type: 'Allow'
@@ -226,6 +246,96 @@ resource adRulesGroupCollection 'Microsoft.Network/firewallPolicies/ruleCollecti
             sourceAddresses: adRulesSourceAddresses
             sourceIpGroups: adRulesSourceIPGroups
           }                                                                  
+        ]
+      }
+      {
+        name: 'coreSystemsRules'
+        priority: coreSystemsRulesPriority
+        ruleCollectionType:'FirewallPolicyFilterRuleCollection'
+        action:{
+          type: 'Allow'
+        }
+        rules:[
+          {
+            ruleType: 'NetworkRule'
+            name: 'RemoteDesktop'
+            ipProtocols:[
+              'TCP'
+            ]
+            destinationAddresses: coreSysRulesDestinationAddresses
+            destinationIpGroups: coreSysRulesDestinationIPGroups
+            destinationFqdns:[]
+            destinationPorts:[
+              '3389'
+            ]
+            sourceAddresses: coreSysRulesSourceAddresses
+            sourceIpGroups: coreSysRulesSourceIPGroups
+          }
+          {
+            ruleType: 'NetworkRule'
+            name: 'ICMP-Pingers'
+            ipProtocols:[
+              'ICMP'
+            ]
+            destinationAddresses: coreSysRulesDestinationAddresses
+            destinationIpGroups: coreSysRulesDestinationIPGroups
+            destinationFqdns:[]
+            destinationPorts:[
+              '*'
+            ]
+            sourceAddresses: coreSysRulesSourceAddresses
+            sourceIpGroups: coreSysRulesSourceIPGroups
+          }
+        ]
+      }
+      {
+        name: 'coreSystemsApplicationRules'
+        priority: coreSystemsApplicationRulesPriority
+        ruleCollectionType:'FirewallPolicyFilterRuleCollection'
+        action:{
+          type: 'Allow'
+        }
+        rules:[
+          {
+            ruleType: 'ApplicationRule'
+            name: 'AllowLogAnalytics'
+            protocols:[
+              {
+                protocolType: 'Https'
+                port: 443
+              }
+            ]
+            destinationAddresses: []
+            fqdnTags:[]
+            targetFqdns: [
+              '*.ods.opinsights.azure.com'
+              '*.oms.opinsights.azure.com'
+              '*.blob.core.windows.net'
+              '*.azure-automation.net'
+            ] 
+            sourceAddresses: [
+              '*'
+            ]
+            sourceIpGroups: []
+          }
+          {
+            ruleType: 'ApplicationRule'
+            name: 'AllowAzurePaaSServices'
+            protocols:[]
+            destinationAddresses: []
+            fqdnTags:[
+              'WindowsDiagnostics'
+              'AzureBackup'
+              'MicrosoftActiveProtectionService'
+              'WindowsUpdate'
+              'WindowsVirtualDesktop'
+            ]
+            targetFqdns:[]
+            sourceAddresses: [
+              '*'
+            ]
+            sourceIpGroups: []
+          }
         ]
       }
     ]

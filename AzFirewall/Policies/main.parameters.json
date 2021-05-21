@@ -1,0 +1,58 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "policyName": {
+            "value": "coreFWPolicy"
+        },
+        "adRulesDestinationIPGroups": {
+            "value": [
+                "<resource id of existing IP Groups01>",
+                "<resource id of existing IP Groups02>"
+            ]
+        },
+        "adRulesDestinationAddresses": {
+            "value": []
+        },
+        "adRulesSourceAddresses": {
+            "value": []
+        },
+        "RulesSourceIPGroups": {
+            "value": [
+                "<resource id of existing IP Groups01>",
+                "<resource id of existing IP Groups02>"
+            ]
+        },
+        "coreSysRulesRulesDestinationIPGroups": {
+            "value": []
+        },
+        "coreSysRulesRulesDestinationAddresses": {
+            "value": [
+                "*"
+            ]
+        },
+        "coreSysRulesRulesSourceAddresses": {
+            "value": []
+        },
+        "coreSysRulesRulesSourceIPGroups": {
+            "value": [
+                "<resource id of existing IP Groups01>",
+                "<resource id of existing IP Groups02>"
+            ]
+        },
+        "coreRuleCollectionGroupPriority":{
+            "value": 100
+        },
+        "firewallPolicySku": {
+            "value": "Standard"
+        },
+        "dnsEnableProxy":{
+            "value": true
+        },
+        "dnsServersIPAddresses":{
+            "value": [
+                "127.0.0.1"
+            ]
+        }
+    }
+}
