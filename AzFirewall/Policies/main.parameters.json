@@ -23,18 +23,18 @@
                 "<resource id of existing IP Groups02>"
             ]
         },
-        "coreSysRulesRulesDestinationIPGroups": {
+        "coreSysRulesDestinationIPGroups": {
             "value": []
         },
-        "coreSysRulesRulesDestinationAddresses": {
+        "coreSysRulesDestinationAddresses": {
             "value": [
                 "*"
             ]
         },
-        "coreSysRulesRulesSourceAddresses": {
+        "coreSysRulesSourceAddresses": {
             "value": []
         },
-        "coreSysRulesRulesSourceIPGroups": {
+        "coreSysRulesSourceIPGroups": {
             "value": [
                 "<resource id of existing IP Groups01>",
                 "<resource id of existing IP Groups02>"
