@@ -17,7 +17,7 @@
         "adRulesSourceAddresses": {
             "value": []
         },
-        "RulesSourceIPGroups": {
+        "adRulesSourceIPGroups": {
             "value": [
                 "<resource id of existing IP Groups01>",
                 "<resource id of existing IP Groups02>"
