@@ -1,5 +1,5 @@
 @description('Name of the SQL MI')
-param sqlManagedInstanceName string = 'ois-drm-dev-gaz-sqlmi-01'
+param sqlManagedInstanceName string = 'dz-wu1-dev-sqlmi-01'
 param location string = resourceGroup().location
 
 @allowed([
@@ -25,11 +25,14 @@ param sqlManagedInstanceSkuName string = 'GP_Gen5'
 @description('Hardware family (Gen4, Gen5)')
 param sqlManagedInstanceHardwareFamily string = 'Gen5'
 
+@description('Name of the existing VNET\'s Resource Group')
+param vnetResourceGroupName string = 'dz-wu1-net-np-rg01'
+
 @description('Name of the existing VNET')
-param vnetResourceName string = 'VN-OIS-DRM-SQL-DEV01'
+param vnetName string = 'dz-wu1-net-np-vnet01'
 
 @description('Name of the existing subnet')
-param managedInstanceSubnetName string = 'SN-OIS-DRM-SQLMI-DEV01'
+param managedInstanceSubnetName string = 'sqlmi-sn'
 
 @description('Admin user for Managed Instance')
 param sqlManagedInstanceAdminLogin string
@@ -81,18 +84,54 @@ param sqlManagedInstanceStorageAccountType string = 'LRS'
 @description('Connection type used for connecting to the instance. - Proxy, Redirect, Default')
 param sqlManagedInstanceProxyOverride string = 'Redirect'
 
-@description('Tags for the Managed Instance SQL resource.')
+@description('Tags for the Managed Instance SQL resources.')
 param sqlManagedInstanceTags object = {}
+
+@description('Provide a comma seperated quoted Database names')
+param sqlMIDatabaseNames array = [
+  'forRobert'
+  'forGary'
+  'DW'
+]
 
 // Referencing an existing Virtual Network
 resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
-  name: vnetResourceName
+  name: vnetName
+  scope: resourceGroup(vnetResourceGroupName)
 }
 
+// Need a handle to existing subnet to determine if it's already been delegated to SQL MI
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' existing = {
+  name: '${vnet.name}/${managedInstanceSubnetName}'
+  scope: resourceGroup(vnetResourceGroupName)
+}
+
+var sqlmiSubnetDelegations = !empty(subnet.properties.delegations) ? subnet.properties.delegations[0].properties.serviceName : ''
+var sqlmiSubnetAddressPrefix = subnet.properties.addressPrefix
+module updateSubnet 'network/subnet.bicep' = {
+  name: 'UpdateSubnet'
+  scope: resourceGroup(vnetResourceGroupName)
+  params: {
+    subnetName: subnet.name
+    sqlManagedInstanceName: sqlManagedInstanceName
+    subnetDelegations: sqlmiSubnetDelegations
+    sqlmiSubnetAddressPrefix: sqlmiSubnetAddressPrefix
+  }
+  dependsOn: [
+    subnet
+  ]
+}
+
+// I think I need to create or select an existing NSG and Route table.
+
+// Create the SQL MI resource
 resource sqlmi 'Microsoft.Sql/managedInstances@2020-11-01-preview' = {
   name: sqlManagedInstanceName
   location: location
   tags: sqlManagedInstanceTags
+  dependsOn: [
+    updateSubnet
+  ]
   identity: {
     type: 'SystemAssigned'
   }
@@ -104,7 +143,7 @@ resource sqlmi 'Microsoft.Sql/managedInstances@2020-11-01-preview' = {
   properties: {
     administratorLogin: sqlManagedInstanceAdminLogin
     administratorLoginPassword: sqlManagedInstancePassword
-    subnetId: '${vnet.id}/subnets/${managedInstanceSubnetName}'
+    subnetId: subnet.id
     licenseType: sqlManagedInstanceLicenseType
     vCores: sqlManagedInstancevCores
     storageSizeInGB: sqlManagedInstanceStorageSizeInGB
@@ -117,3 +156,16 @@ resource sqlmi 'Microsoft.Sql/managedInstances@2020-11-01-preview' = {
     zoneRedundant: false
   }
 }
+
+// Create the databases based on the parameter sqlMIDatabaseNames
+resource sqlmiDBs 'Microsoft.Sql/managedInstances/databases@2020-11-01-preview' = [for dbName in sqlMIDatabaseNames: {
+  name: '${sqlmi.name}/${dbName}'
+  location: location
+  tags: sqlManagedInstanceTags
+  dependsOn: [
+    sqlmi
+  ]
+  properties: {
+    collation: sqlManagedInstanceCollation
+  }
+}]
