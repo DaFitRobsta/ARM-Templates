@@ -1,0 +1,37 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "roleName": {
+            "value": "[Online] Subscription Owner"
+        },
+        "roleDescription": {
+            "value": "Grants full access to manage all resources, except core networking components and RBAC"
+        },
+        "assignableScopes": {
+            "value": [
+                    "/providers/Microsoft.Management/managementGroups/ESWT-online"
+            ]
+        },
+        "actions": {
+            "value": [
+                "*"
+            ]
+        },
+        "notActions": {
+            "value": [
+                "Microsoft.Authorization/*/write",
+                "Microsoft.Network/vpnGateways/*",
+                "Microsoft.Network/expressRouteCircuits/*",
+                "Microsoft.Network/routeTables/write",
+                "Microsoft.Network/vpnSites/*"
+            ]
+        },
+        "dataActions": {
+            "value": []
+        },
+        "notDataActions": {
+            "value": []
+        }
+    }
+}

@@ -1,0 +1,39 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "roleName": {
+            "value": "[WVD] Log Analytics Reader"
+        },
+        "roleDescription": {
+            "value": "Grants specific access to the WVD Log Analytics Workspace tables."
+        },
+        "assignableScopes": {
+            "value": [
+                    "/subscriptions/{11111111-1111-1111-1111-111111111111}"
+            ]
+        },
+        "actions": {
+            "value": [
+                "Microsoft.OperationalInsights/workspaces/read",
+                "Microsoft.OperationalInsights/workspaces/query/read",
+                "Microsoft.OperationalInsights/workspaces/query/WVDAgentHealthStatus/read",
+                "Microsoft.OperationalInsights/workspaces/query/WVDCheckpoints/read",
+                "Microsoft.OperationalInsights/workspaces/query/WVDConnections/read",
+                "Microsoft.OperationalInsights/workspaces/query/WVDErrors/read",
+                "Microsoft.OperationalInsights/workspaces/query/WVDFeeds/read",
+                "Microsoft.OperationalInsights/workspaces/query/WVDHostRegistrations/read",
+                "Microsoft.OperationalInsights/workspaces/query/WVDManagement/read"
+            ]
+        },
+        "notActions": {
+            "value": []
+        },
+        "dataActions": {
+            "value": []
+        },
+        "notDataActions": {
+            "value": []
+        }
+    }
+}
