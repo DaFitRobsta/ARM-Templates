@@ -6,10 +6,10 @@
             "value": "dz-wu2-dev-sqlmi-01"
         },
         "vnetName": {
-            "value": "dz-wu2-net-np-vnet01"
+            "value": "dz-wu2-net-np-vnet02"
         },
         "vnetResourceGroupName": {
-            "value": "dz-wu2-net-np-rg01"
+            "value": "dz-wu2-net-np-rg02"
         },
         "managedInstanceSubnetName": {
             "value": "sqlmi-sn"

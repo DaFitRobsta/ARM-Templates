@@ -100,37 +100,104 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
   scope: resourceGroup(vnetResourceGroupName)
 }
 
-// Need a handle to existing subnet to determine if it's already been delegated to SQL MI
+// Need a reference to an existing subnet to determine if it's already been delegated to SQL MI
 resource subnet 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' existing = {
   name: '${vnet.name}/${managedInstanceSubnetName}'
   scope: resourceGroup(vnetResourceGroupName)
 }
 
+// Retrieve properties of the subnet, like delegation, NSG, and UDR
 var sqlmiSubnetDelegations = !empty(subnet.properties.delegations) ? subnet.properties.delegations[0].properties.serviceName : ''
+//var sqlmiSubnetNSGid = !empty(subnet.properties.networkSecurityGroup) ? subnet.properties.networkSecurityGroup.id : ''
+var sqlmiSubnetNSGid = contains(subnet.properties, 'networkSecurityGroup') ? subnet.properties.networkSecurityGroup.id : ''
+//var sqlmiSubnetUDRid = !empty(subnet.properties.routeTable) ? subnet.properties.routeTable.id : ''
+var sqlmiSubnetUDRid = contains(subnet.properties, 'routeTable') ? subnet.properties.routeTable.id : ''
 var sqlmiSubnetAddressPrefix = subnet.properties.addressPrefix
-module updateSubnet 'network/subnet.bicep' = {
-  name: 'UpdateSubnet'
+
+// Since sqlmiSubnetDelegations can't be evaluated in the main.bicep, we are passing it into another module for evalution. If
+// sqlmiSubnetDelegations is empty, then the ARM template will add Microsoft.SQL/managedInstances as a delegation to the subnet
+module checkSqlMiSubnet 'network/sqlmi-subnet.bicep' = {
+  name: 'checkSqlMiSubnet'
+  scope: resourceGroup(vnetResourceGroupName)
+  params: {
+    location: location
+    nsgName: '${vnetName}-${managedInstanceSubnetName}-NSG'
+    sqlmiNSGid: sqlmiSubnetNSGid
+    sqlmiSubnetAddressPrefix: sqlmiSubnetAddressPrefix
+    subnetName: subnet.name
+    sqlManagedInstanceName: sqlManagedInstanceName
+    subnetDelegations: sqlmiSubnetDelegations
+    vnetName: vnet.name
+    udrName: '${vnetName}-${managedInstanceSubnetName}-UDR'
+    tags: sqlManagedInstanceTags
+    sqlmiUDRid: sqlmiSubnetUDRid
+  }
+  dependsOn: [
+    subnet
+  ]  
+}
+/*
+module addSqlMiDelegationSubnet 'network/sqlmi-delegation-subnet.bicep' = {
+  name: 'addSqlMiDelegationSubnet'
   scope: resourceGroup(vnetResourceGroupName)
   params: {
     subnetName: subnet.name
     sqlManagedInstanceName: sqlManagedInstanceName
     subnetDelegations: sqlmiSubnetDelegations
     sqlmiSubnetAddressPrefix: sqlmiSubnetAddressPrefix
+    vnetName: vnet.name
   }
   dependsOn: [
     subnet
   ]
 }
 
-// I think I need to create or select an existing NSG and Route table.
+// Determine if NSG exists, if not, create NSG and assign it to the subnet
+module addNSGtoSubnet 'network/sqlmi-nsg.bicep' = {
+  name: 'addNSGtoSubnet'
+  scope: resourceGroup(vnetResourceGroupName)
+  params: {
+    subnetName: subnet.name
+    vnetName: vnet.name
+    location: location
+    nsgName: '${vnetName}-${managedInstanceSubnetName}-NSG'
+    tags: sqlManagedInstanceTags
+    sqlmiNSGid: sqlmiSubnetNSGid
+    sqlmiSubnetAddressPrefix: sqlmiSubnetAddressPrefix
+  }
+  dependsOn: [
+    subnet
+    addSqlMiDelegationSubnet
+  ]
+}
 
+// Determine if UDR exists, if not, create UDR and assign it to the subnet
+module addUDRtoSubnet 'network/sqlmi-udr.bicep' = {
+  name: 'addUDRtoSubnet'
+  scope: resourceGroup(vnetResourceGroupName)
+  params: {
+    subnetName: subnet.name
+    vnetName: vnet.name
+    location: location
+    udrName: '${vnetName}-${managedInstanceSubnetName}-UDR'
+    tags: sqlManagedInstanceTags
+    sqlmiUDRid: sqlmiSubnetUDRid
+    sqlmiSubnetAddressPrefix: sqlmiSubnetAddressPrefix
+  }
+  dependsOn: [
+    subnet
+    addSqlMiDelegationSubnet
+    addNSGtoSubnet
+  ]
+}
+*/
 // Create the SQL MI resource
 resource sqlmi 'Microsoft.Sql/managedInstances@2020-11-01-preview' = {
   name: sqlManagedInstanceName
   location: location
   tags: sqlManagedInstanceTags
   dependsOn: [
-    updateSubnet
+    checkSqlMiSubnet
   ]
   identity: {
     type: 'SystemAssigned'
