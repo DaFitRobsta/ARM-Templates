@@ -13,7 +13,7 @@ Write-Host ""
 $subscriptionName = Read-Host -Prompt "Enter Subscription Name"
 $result = Select-AzSubscription -SubscriptionName $subscriptionName
 Write-Host ""
-Write-Host "List of available Resrouce Groups:" -ForegroundColor Green
+Write-Host "List of available Resource Groups:" -ForegroundColor Green
 (Get-AzResourceGroup).ResourceGroupName
 Write-Host ""
 $resourceGroup = Read-Host -Prompt "Enter the Resource Group Name (where ARM template will be deployed into)"
