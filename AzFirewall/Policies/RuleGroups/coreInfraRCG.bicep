@@ -30,12 +30,15 @@ param coreSysRulesSourceIPGroups array = []
 param coreRuleCollectionGroupPriority int = 100
 
 // Set the Rules Collection Priority
-var adRulesPriority = 100
-var coreSystemsRulesPriority = 105
-var coreSystemsApplicationRulesPriority = 110
+var adRulesPriority = coreRuleCollectionGroupPriority
+var coreSystemsRulesPriority = adRulesPriority + 5
+var coreSystemsApplicationRulesPriority = coreSystemsRulesPriority + 5
 
-resource coreInfraRulesGroupCollection 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2020-11-01' = {
-  name: '${fwPolicyName}/CoreInfrastructureRulesCollectionGroup'
+// Get the environment storage blob URI
+var blobStorage = '*.blob.${environment().suffixes.storage}'
+
+resource coreInfraRuleCollectionGroups 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2020-11-01' = {
+  name: '${fwPolicyName}/CoreInfrastructureRCG'
   properties:{
     priority: coreRuleCollectionGroupPriority
     ruleCollections:[
@@ -310,7 +313,7 @@ resource coreInfraRulesGroupCollection 'Microsoft.Network/firewallPolicies/ruleC
             targetFqdns: [
               '*.ods.opinsights.azure.com'
               '*.oms.opinsights.azure.com'
-              '*.blob.core.windows.net'
+              blobStorage
               '*.azure-automation.net'
             ] 
             sourceAddresses: [

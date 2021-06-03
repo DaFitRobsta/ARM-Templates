@@ -11,7 +11,7 @@ There is a Core Infrastructure Rules Collection Group that contains rule collect
 *        ActiveDirectoryRules
 *        coreSystemsRules
 *        coreSystemsApplicationRules
-* DiscoveryRulesCollectionGroup
+* AssetRulesCollectionGroup
 *        ServiceNowDiscoveryRules
 
 ## Where to begin

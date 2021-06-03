@@ -1,1 +1,1 @@
-Store all of my ARM template developments.
+A place for all of my ARM template developments.

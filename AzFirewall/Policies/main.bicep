@@ -32,6 +32,14 @@ param dnsEnableProxy bool = false
 @description('Tier of Firewall Policy. - Standard or Premium')
 param firewallPolicySku string = 'Standard'
 
+@description('Private IP ranges (SNAT) that will not be SNAT\'d by the Az Firewall')
+param fwPolicyPrivateIPAddresses array = [
+  '10.0.0.0/8'
+  '172.16.0.0/12'
+  '192.168.0.0/16'
+  '100.64.0.0/10'
+]
+
 resource baseFwPolicy 'Microsoft.Network/firewallPolicies@2020-11-01' = {
   name: policyName
   location: location
@@ -52,10 +60,13 @@ resource baseFwPolicy 'Microsoft.Network/firewallPolicies@2020-11-01' = {
     sku: {
       tier: firewallPolicySku
     }
+    snat: {
+      privateRanges: fwPolicyPrivateIPAddresses
+    }
   }
 }
 
-// ADDS Rule Collection Group
+// ADDS Rule Collection Source/Destination IP Addresses or IP Groups
 @description('List of Destination AD DS Server IP Addresses or range - comma seperated quoted IP addresses')
 param adRulesDestinationAddresses array = []
 
@@ -68,6 +79,7 @@ param adRulesSourceAddresses array = []
 @description('List of Source AD DS Server IP Group(s) - comma seperated quoted IP Groups ID(s)')
 param adRulesSourceIPGroups array = []
 
+// Core Systems Rule Collection Source/Destination IP Addresses or IP Groups
 @description('For the Core Systems Rules, set the destination addresses in comma seperated quoted IP addresses')
 param coreSysRulesDestinationAddresses array = []
 
@@ -80,13 +92,13 @@ param coreSysRulesSourceAddresses array = []
 @description('For the Core Systems Rules, set the source IP Groups resource Id in comma seperated quoted IDs')
 param coreSysRulesSourceIPGroups array = []
 
-@description('Priority of the AD Rule Collection Group')
+@description('Priority of the Core Infrastructrue Rule Collection Group')
 param coreRuleCollectionGroupPriority int = 100
 
-module adRulesCollection 'RuleGroups/coreInfraRCG.bicep' = if (((!empty(adRulesDestinationAddresses) && empty(adRulesDestinationIPGroups)) || (empty(adRulesDestinationAddresses) && !empty(adRulesDestinationIPGroups))) && ((!empty(adRulesSourceAddresses) && empty(adRulesSourceIPGroups)) || (empty(adRulesSourceAddresses) && !empty(adRulesSourceIPGroups))))  {
-  name: 'adRulesCollectionDeploy'
+module coreInfrastructureRCG 'RuleGroups/coreInfraRCG.bicep' = if (((!empty(adRulesDestinationAddresses) && empty(adRulesDestinationIPGroups)) || (empty(adRulesDestinationAddresses) && !empty(adRulesDestinationIPGroups))) && ((!empty(adRulesSourceAddresses) && empty(adRulesSourceIPGroups)) || (empty(adRulesSourceAddresses) && !empty(adRulesSourceIPGroups))))  {
+  name: 'coreInfrastructureRCG'
   params:{
-    fwPolicyName: policyName
+    fwPolicyName: baseFwPolicy.name
     adRulesDestinationAddresses: empty(adRulesDestinationAddresses) ? [] : adRulesDestinationAddresses
     adRulesDestinationIPGroups: empty(adRulesDestinationIPGroups) ? [] : adRulesDestinationIPGroups
     adRulesSourceAddresses: empty(adRulesSourceAddresses) ? [] : adRulesSourceAddresses
@@ -97,7 +109,35 @@ module adRulesCollection 'RuleGroups/coreInfraRCG.bicep' = if (((!empty(adRulesD
     coreSysRulesSourceIPGroups: empty(coreSysRulesSourceIPGroups) ? [] : coreSysRulesSourceIPGroups
     coreRuleCollectionGroupPriority: coreRuleCollectionGroupPriority
   }
-  dependsOn:[
-    baseFwPolicy
+}
+
+@description('Priority of the Asset Rule Collection Group')
+param assetDiscoveryRCGPriority int = 200
+
+@description('For the Snow Discovery Rules, set the destination addresses in comma seperated quoted IP addresses')
+param snowRulesDestinationAddresses array = []
+
+@description('For the Snow Discovery Rules, set the destination IP Groups resource Id in comma seperated quoted IDs')
+param snowRulesDestinationIPGroups array = []
+
+@description('For the Snow Discovery Rules, set the source addresses in comma seperated quoted IP addresses')
+param snowRulesSourceAddresses array = []
+
+@description('For the Snow Discovery Rules, set the source IP Groups resource Id in comma seperated quoted IDs')
+param snowRulesSourceIPGroups array = []
+
+// Add Asset Discovery RCG
+module assetRCG 'RuleGroups/assetDiscoveryRCG.bicep' = if (((!empty(snowRulesDestinationAddresses) && empty(snowRulesDestinationIPGroups)) || (empty(snowRulesDestinationAddresses) && !empty(snowRulesDestinationIPGroups))) && ((!empty(snowRulesSourceAddresses) && empty(snowRulesSourceIPGroups)) || (empty(snowRulesSourceAddresses) && !empty(snowRulesSourceIPGroups)))) {
+  name: 'assetDiscoveryRCG'
+  params: {
+    fwPolicyName: baseFwPolicy.name
+    snowRulesDestinationAddresses: empty(snowRulesDestinationAddresses) ? [] : snowRulesDestinationAddresses
+    snowRulesDestinationIPGroups: empty(snowRulesDestinationIPGroups) ? [] : snowRulesDestinationIPGroups
+    snowRulesSourceAddresses: empty(snowRulesSourceAddresses) ? [] : snowRulesSourceAddresses
+    snowRulesSourceIPGroups: empty(snowRulesSourceIPGroups) ? [] : snowRulesSourceIPGroups
+    assetDiscoveryRCGPriority: assetDiscoveryRCGPriority
+  }
+  dependsOn: [
+    coreInfrastructureRCG
   ]
 }
