@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "roleName": {
-            "value": "[SL] Subscription Owner"
+            "value": "[Corp] Subscription Owner"
         },
         "roleDescription": {
             "value": "[No VNET Creation] Grants full access to manage all resources, except core networking components and RBAC"

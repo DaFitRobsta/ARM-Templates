@@ -21,5 +21,5 @@ If you used this method to initially deploy the Custom Role, the Id of the role 
 ## PowerShell Deployment
 
 ```powershell
-   New-AzManagementGroupDeployment -Location westus -TemplateFile .\customRole.bicep -TemplateParameterFile .\subscriptionOwner-corp.json -ManagementGroupId {groupId1}
+   New-AzManagementGroupDeployment -Location westus -TemplateFile .\customRole.bicep -TemplateParameterFile .\subscriptionOwner-corp.parameters.json -ManagementGroupId {groupId1}
 ```
