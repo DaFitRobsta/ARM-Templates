@@ -1,20 +1,28 @@
 
-resource symbolicname 'Microsoft.Sql/managedInstances/databases@2020-11-01-preview' = {
-  name: 'string'
-  location: 'string'
-  tags: {}
+param sqlMIDatabaseNames array = []
+param sqlmiName string = ''
+param location string = ''
+param tags object = {}
+param sqlManagedInstanceCollation string = ''
+param dbRetentionDays int = 7
+
+// Create a database
+resource sqlmiDBs 'Microsoft.Sql/managedInstances/databases@2020-11-01-preview' = [for dbName in sqlMIDatabaseNames: {
+  name: '${sqlmiName}/${dbName}'
+  location: location
+  tags: tags
+  dependsOn: []
   properties: {
-    collation: 'string'
-    restorePointInTime: 'string'
-    catalogCollation: 'string'
-    createMode: 'string'
-    storageContainerUri: 'string'
-    sourceDatabaseId: 'string'
-    restorableDroppedDatabaseId: 'string'
-    storageContainerSasToken: 'string'
-    recoverableDatabaseId: 'string'
-    longTermRetentionBackupResourceId: 'string'
-    autoCompleteRestore: bool
-    lastBackupName: 'string'
+    collation: sqlManagedInstanceCollation
   }
-}
+}]
+
+// Set the backupShortTermRetention for the database
+resource sqlmiDBsShortTermRetention 'Microsoft.Sql/managedInstances/databases/backupShortTermRetentionPolicies@2021-02-01-preview' = [for dbName in sqlMIDatabaseNames: {
+  name: '${sqlmiName}/${dbName}/default'
+  properties: {
+    retentionDays: dbRetentionDays
+  }
+}]
+
+// Set the database Security Alert Policies

@@ -94,6 +94,11 @@ param sqlMIDatabaseNames array = [
   'DW'
 ]
 
+@minValue(1)
+@maxValue(35)
+@description('Specify how long you want to keep your point-in-time backups. Default value is 7 days')
+param dbRetentionDays int = 7
+
 // Specify Azure AD Administrator Login
 param sqlManagedInstanceEnableAADAuthentication bool = false
 param sqlManagedInstanceAdministratorAADLogin string = ''
@@ -200,6 +205,11 @@ resource sqlmiAADonlyAuthentication 'Microsoft.Sql/managedInstances/azureADOnlyA
 }
 
 // Create the databases based on the parameter sqlMIDatabaseNames
+module createSqlmiDBs 'databases/databases.bicep' = {
+  name: 'foobar'
+  
+}
+
 resource sqlmiDBs 'Microsoft.Sql/managedInstances/databases@2020-11-01-preview' = [for dbName in sqlMIDatabaseNames: {
   name: '${sqlmi.name}/${dbName}'
   location: location
