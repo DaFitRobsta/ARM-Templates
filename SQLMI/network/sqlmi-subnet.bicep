@@ -6,9 +6,19 @@ param sqlmiNSGid string
 param sqlmiUDRid string
 param subnetDelegations string
 param tags object
-param vnetName string
 param nsgName string
 param udrName string
+param sqlmiSubnetServiceEndpoints array = []
+
+var sqlmiServiceEndpointStorage = [
+  {
+    service: 'Microsoft.Storage'
+    locations: [
+      location
+    ]
+  }
+]
+var sqlmiServiceEndpoints = empty(sqlmiSubnetServiceEndpoints) ? sqlmiServiceEndpointStorage : union(sqlmiSubnetServiceEndpoints, sqlmiServiceEndpointStorage)
 
 
 // Create a new NSG if one is not already assigned to subnet
@@ -32,7 +42,7 @@ resource sqlmiUDR 'Microsoft.Network/routeTables@2020-11-01' = if (empty(sqlmiUD
 }
 
 // Assign delgation, NSG, and UDR to subnet if it's not already setup
-resource sqlmiNewNsgAndUdrSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' = if((empty(sqlmiNSGid) && empty(sqlmiUDRid)) || (empty(sqlmiNSGid) && !empty(sqlmiUDRid)) || (!empty(sqlmiNSGid) && empty(sqlmiUDRid)) || (!empty(sqlmiNSGid) && !empty(sqlmiUDRid) && empty(subnetDelegations))){
+resource sqlmiNewNsgAndUdrSubnet 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' = if((empty(sqlmiNSGid) && empty(sqlmiUDRid)) || (empty(sqlmiNSGid) && !empty(sqlmiUDRid)) || (!empty(sqlmiNSGid) && empty(sqlmiUDRid)) || (!empty(sqlmiNSGid) && !empty(sqlmiUDRid) && empty(subnetDelegations)) || (!empty(sqlmiNSGid) && !empty(sqlmiUDRid) && !empty(subnetDelegations) && empty(sqlmiSubnetServiceEndpoints))){
   name: subnetName
   properties: {
     addressPrefix: sqlmiSubnetAddressPrefix
@@ -49,11 +59,13 @@ resource sqlmiNewNsgAndUdrSubnet 'Microsoft.Network/virtualNetworks/subnets@2020
     }
     routeTable: {
       id: empty(sqlmiUDRid) ? sqlmiUDR.id : sqlmiUDRid
-    }    
+    }
+    serviceEndpoints: sqlmiServiceEndpoints 
   }
 }
 
 
 output nsgNameout string = nsgName
 output subnetName string = subnetName
-output nsgId string = sqlmiNSG.id 
+output nsgId string = sqlmiNSG.id
+output sqlmiServiceEndpoints array = sqlmiServiceEndpoints

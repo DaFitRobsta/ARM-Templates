@@ -25,6 +25,21 @@
                     "Environment": "Dev",
                     "Project": "Demo"
                 }
+        },
+        "dbRetentionDays": {
+            "value": 3
+        },
+        "sqlmiVulnerabilityAssessmentRecurringScans": {
+            "value": true
+        },
+        "sqlmiVulnerabilityAssessmentRecurringScansEmailSubAdmins": {
+            "value": true
+        },
+        "sqlmiVulnerabilityAssessmentRecurringScansEmails": {
+            "value": [
+                "joe@bar.com",
+                "jack@foo.bar.com"
+            ]
         }
     }
 }

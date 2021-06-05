@@ -108,6 +108,11 @@ param sqlManagedInstanceAdministratorAADTenantID string = ''
 // Specify whether or not to only allow AAD authentication
 param sqlManagedInstanceAADonlyAuthentication bool = false
 
+// Specify vulnerability assessment parameters
+param sqlmiVulnerabilityAssessmentRecurringScans bool = true
+param sqlmiVulnerabilityAssessmentRecurringScansEmailSubAdmins bool = true
+param sqlmiVulnerabilityAssessmentRecurringScansEmails array = []
+
 // Security Alert parameters
 //param 
 
@@ -128,6 +133,7 @@ var sqlmiSubnetDelegations = !empty(subnet.properties.delegations) ? subnet.prop
 var sqlmiSubnetNSGid = contains(subnet.properties, 'networkSecurityGroup') ? subnet.properties.networkSecurityGroup.id : ''
 var sqlmiSubnetUDRid = contains(subnet.properties, 'routeTable') ? subnet.properties.routeTable.id : ''
 var sqlmiSubnetAddressPrefix = subnet.properties.addressPrefix
+var sqlmiSubnetServiceEndpoints = contains(subnet.properties, 'serviceEndpoints') ? subnet.properties.serviceEndpoints : []
 
 // Since sqlmiSubnetDelegations can't be evaluated in the main.bicep, we are passing it into another module for evalution. If
 // sqlmiSubnetDelegations is empty, then the ARM template will add Microsoft.SQL/managedInstances as a delegation to the subnet
@@ -142,15 +148,36 @@ module checkSqlMiSubnet 'network/sqlmi-subnet.bicep' = {
     subnetName: subnet.name
     sqlManagedInstanceName: sqlManagedInstanceName
     subnetDelegations: sqlmiSubnetDelegations
-    vnetName: vnet.name
     udrName: '${vnetName}-${managedInstanceSubnetName}-UDR'
     tags: sqlManagedInstanceTags
     sqlmiUDRid: sqlmiSubnetUDRid
+    sqlmiSubnetServiceEndpoints: sqlmiSubnetServiceEndpoints
   }
   dependsOn: [
     subnet
   ]  
 }
+
+// Create a storage account for the Azure Defender Vulnerablity Assessments
+var storageAccountName = 'sql${uniqueString(sqlManagedInstanceName)}'
+module createStorage 'storageaccount/storageaccount.bicep' = {
+  name: 'createStorageAccount'
+  params: {
+   location: location
+   storKind: 'StorageV2'
+   storSKU: 'Standard_LRS'
+   storName: storageAccountName
+   subnetID: subnet.id
+  }
+  dependsOn: [
+    checkSqlMiSubnet
+  ]
+}
+// Get access key of storage account
+var storageAccountAccessKey = createStorage.outputs.storageAccountAccessKey
+var storageAccountContainerPath = '${createStorage.outputs.storageAccountBlobUri}vulnerability-assessment'
+
+// Create a Key Vault
 
 // Create the SQL MI resource
 resource sqlmi 'Microsoft.Sql/managedInstances@2020-11-01-preview' = {
@@ -197,27 +224,56 @@ resource sqlmiAADauthentication 'Microsoft.Sql/managedInstances/administrators@2
 }
 
 // Set AAD only Authentication for SQL MI
-resource sqlmiAADonlyAuthentication 'Microsoft.Sql/managedInstances/azureADOnlyAuthentications@2020-11-01-preview' = {
+resource sqlmiAADonlyAuthentication 'Microsoft.Sql/managedInstances/azureADOnlyAuthentications@2020-11-01-preview' = if (sqlManagedInstanceAADonlyAuthentication) {
   name: '${sqlmi.name}/Default'
   properties: {
     azureADOnlyAuthentication: sqlManagedInstanceAADonlyAuthentication
   }  
 }
 
-// Create the databases based on the parameter sqlMIDatabaseNames
-module createSqlmiDBs 'databases/databases.bicep' = {
-  name: 'foobar'
-  
+// Enable Azure Defender
+resource sqlmiSecurityAlertPolicies 'Microsoft.Sql/managedInstances/securityAlertPolicies@2021-02-01-preview' = {
+  name: '${sqlmi.name}/Default'
+  properties: {
+   state: 'Enabled'
+   storageAccountAccessKey: storageAccountAccessKey
+   storageEndpoint: createStorage.outputs.storageAccountBlobUri
+  }
+  dependsOn: [
+    createStorage
+  ]
 }
 
-resource sqlmiDBs 'Microsoft.Sql/managedInstances/databases@2020-11-01-preview' = [for dbName in sqlMIDatabaseNames: {
-  name: '${sqlmi.name}/${dbName}'
-  location: location
-  tags: sqlManagedInstanceTags
-  dependsOn: [
-    sqlmi
-  ]
+// Setup Azure Defender vulnerability assessments
+resource sqlmiVulnerabilityAssessments 'Microsoft.Sql/managedInstances/vulnerabilityAssessments@2021-02-01-preview' = {
+  name: '${sqlmi.name}/Default'
   properties: {
-    collation: sqlManagedInstanceCollation
+    recurringScans: {
+      isEnabled: sqlmiVulnerabilityAssessmentRecurringScans
+      emailSubscriptionAdmins: sqlmiVulnerabilityAssessmentRecurringScansEmailSubAdmins
+      emails: sqlmiVulnerabilityAssessmentRecurringScansEmails
+    }
+    storageContainerPath: storageAccountContainerPath
+    storageAccountAccessKey: storageAccountAccessKey
   }
-}]
+  dependsOn: [
+    createStorage
+    sqlmiSecurityAlertPolicies
+  ] 
+}
+
+// Create the databases based on the parameter sqlMIDatabaseNames
+module createSqlmiDBs 'databases/databases.bicep' = {
+  name: 'createDBs'
+  params: {
+   dbRetentionDays: dbRetentionDays
+   location: location
+   sqlManagedInstanceCollation: sqlManagedInstanceCollation
+   sqlMIDatabaseNames: sqlMIDatabaseNames
+   sqlmiName: sqlmi.name
+   tags: sqlManagedInstanceTags
+  }
+  dependsOn: [
+    sqlmiVulnerabilityAssessments
+  ]
+}
