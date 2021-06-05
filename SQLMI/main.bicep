@@ -174,7 +174,6 @@ module createStorage 'storageaccount/storageaccount.bicep' = {
   ]
 }
 // Get access key of storage account
-var storageAccountAccessKey = createStorage.outputs.storageAccountAccessKey
 var storageAccountContainerPath = '${createStorage.outputs.storageAccountBlobUri}vulnerability-assessment'
 
 // Create a Key Vault
@@ -252,6 +251,7 @@ resource sqlmiSecurityAlertPolicies 'Microsoft.Sql/managedInstances/securityAler
 }
 
 // Setup Azure Defender vulnerability assessments
+// reference: https://docs.microsoft.com/en-us/azure/azure-sql/database/sql-database-vulnerability-assessment-storage
 resource sqlmiVulnerabilityAssessments 'Microsoft.Sql/managedInstances/vulnerabilityAssessments@2021-02-01-preview' = {
   name: '${sqlmi.name}/Default'
   properties: {
