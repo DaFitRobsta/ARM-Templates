@@ -231,13 +231,20 @@ resource sqlmiAADonlyAuthentication 'Microsoft.Sql/managedInstances/azureADOnlyA
   }  
 }
 
+// Assign SQL MI Identity to storage account
+module assignSqlmiToResourceGroup 'storageaccount/grantSqlMiAccess.bicep' = {
+  name: 'assignSqlmiToResourceGroup'
+  params: {
+    sqlmiIdentity: sqlmi.identity.principalId
+  }
+}
 // Enable Azure Defender
 resource sqlmiSecurityAlertPolicies 'Microsoft.Sql/managedInstances/securityAlertPolicies@2021-02-01-preview' = {
   name: '${sqlmi.name}/Default'
   properties: {
    state: 'Enabled'
-   storageAccountAccessKey: storageAccountAccessKey
-   storageEndpoint: createStorage.outputs.storageAccountBlobUri
+   //storageAccountAccessKey: storageAccountAccessKey
+   //storageEndpoint: createStorage.outputs.storageAccountBlobUri
   }
   dependsOn: [
     createStorage
@@ -254,7 +261,7 @@ resource sqlmiVulnerabilityAssessments 'Microsoft.Sql/managedInstances/vulnerabi
       emails: sqlmiVulnerabilityAssessmentRecurringScansEmails
     }
     storageContainerPath: storageAccountContainerPath
-    storageAccountAccessKey: storageAccountAccessKey
+    //storageAccountAccessKey: storageAccountAccessKey
   }
   dependsOn: [
     createStorage

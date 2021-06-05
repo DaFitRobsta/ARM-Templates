@@ -32,4 +32,5 @@ resource sqlmiStorageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
 }
 
 output storageAccountBlobUri string = sqlmiStorageAccount.properties.primaryEndpoints.blob
-output storageAccountAccessKey string = listkeys(sqlmiStorageAccount.name, '2021-04-01').keys[0].value
+//output storageAccountAccessKey string = listkeys(sqlmiStorageAccount.name, '2021-04-01').keys[0].value
+// output storageAccountResourceId string = sqlmiStorageAccount.id
