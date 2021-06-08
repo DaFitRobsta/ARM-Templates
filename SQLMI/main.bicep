@@ -113,8 +113,13 @@ param sqlmiVulnerabilityAssessmentRecurringScans bool = true
 param sqlmiVulnerabilityAssessmentRecurringScansEmailSubAdmins bool = true
 param sqlmiVulnerabilityAssessmentRecurringScansEmails array = []
 
-// Security Alert parameters
-//param 
+// Key Vaull parameters
+@allowed([
+  'standard'
+  'premium'
+])
+@description('Key Vault SKU, standard or premium')
+param sqlmiKeyVaultSkuName string = 'premium'
 
 // Referencing an existing Virtual Network
 resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
@@ -176,8 +181,6 @@ module createStorage 'storageaccount/storageaccount.bicep' = {
 // Get access key of storage account
 var storageAccountContainerPath = '${createStorage.outputs.storageAccountBlobUri}vulnerability-assessment'
 
-// Create a Key Vault
-
 // Create the SQL MI resource
 resource sqlmi 'Microsoft.Sql/managedInstances@2020-11-01-preview' = {
   name: sqlManagedInstanceName
@@ -237,7 +240,36 @@ module assignSqlmiToResourceGroup 'storageaccount/grantSqlMiAccess.bicep' = {
     sqlmiIdentity: sqlmi.identity.principalId
   }
 }
-// Enable Azure Defender
+
+// Create a sqlmi Key Vault for BYOK with key
+var sqlmiKeyVaultName = 'kv-${uniqueString(sqlManagedInstanceName)}-01'
+module sqlmiKeyVault 'keyvault/keyvault.bicep' = {
+  name: 'createSqlmiKeyVault'
+  params: {
+    location: location
+    sqlmiIdentity: sqlmi.identity.principalId
+    sqlmiKeyVaultName: sqlmiKeyVaultName
+    sqlmiKeyVaultSkuName: sqlmiKeyVaultSkuName
+    sqlmiName: sqlmi.name
+    sqlmiResourceId: sqlmi.id
+    tags: sqlManagedInstanceTags
+  }  
+}
+
+// Set the SQL MI key to the AzureKeyVault
+module setTDE 'configuration/setTDE.bicep' = {
+  name: 'setTDE'
+  params: {
+    sqlmiKeyVaultKeyUriWithVersion: sqlmiKeyVault.outputs.sqlmiKeyVaultKeyUriWithVersion
+    sqlmiKeyVaultName: sqlmiKeyVaultName
+    sqlmiName: sqlmi.name
+  }
+  dependsOn: [
+    sqlmiKeyVault
+  ]
+}
+
+// Enable Azure Defender for SQL
 resource sqlmiSecurityAlertPolicies 'Microsoft.Sql/managedInstances/securityAlertPolicies@2021-02-01-preview' = {
   name: '${sqlmi.name}/Default'
   properties: {
