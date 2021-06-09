@@ -1,1 +1,3 @@
 AzFirewall/Policies/main.sl.parameters.json
+SQLMI/ARM/parameters.json
+SQLMI/ARM/template.json

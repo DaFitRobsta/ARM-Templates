@@ -34,7 +34,7 @@ resource sqlmiKeyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
       }
     ]
     networkAcls: {
-      defaultAction: 'Allow'
+      defaultAction: 'Deny'
       bypass: 'AzureServices'
     }
     enableSoftDelete: true
@@ -55,6 +55,8 @@ resource sleep 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
 }
 */
 
+// The individual deploying this ARM template must be an Owner or User Administrator over the Subscription
+// in order to create a key within the key vault.
 resource sqlmiKey 'Microsoft.KeyVault/vaults/keys@2019-09-01' = {
   name: '${sqlmiKeyVault.name}/${sqlmiName}'
   tags: tags
