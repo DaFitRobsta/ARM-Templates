@@ -1,0 +1,38 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "roleName": {
+            "value": "[Custom] Automation Account Contributor"
+        },
+        "roleDescription": {
+            "value": "Allows access to manage Azure Automation and its resources"
+        },
+        "assignableScopes": {
+            "value": [
+                    "/providers/Microsoft.Management/managementGroups/ESWT-sandboxes"
+            ]
+        },
+        "actions": {
+            "value": [
+                "Microsoft.Authorization/*/read",
+                "Microsoft.Insights/alertRules/*",
+                "Microsoft.Insights/metrics/read",
+                "Microsoft.Insights/diagnosticSettings/*",
+                "Microsoft.Resources/deployments/*",
+                "Microsoft.Resources/subscriptions/resourceGroups/read",
+                "Microsoft.Automation/automationAccounts/*",
+                "Microsoft.Support/*"                
+            ]
+        },
+        "notActions": {
+            "value": []
+        },
+        "dataActions": {
+            "value": []
+        },
+        "notDataActions": {
+            "value": []
+        }
+    }
+}

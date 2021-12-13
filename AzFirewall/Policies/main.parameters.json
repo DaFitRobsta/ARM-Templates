@@ -1,0 +1,84 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "policyName": {
+            "value": "coreFWPolicy"
+        },
+        "adRulesDestinationIPGroups": {
+            "value": [
+                "<resource id of existing IP Groups01>",
+                "<resource id of existing IP Groups02>"
+            ]
+        },
+        "adRulesDestinationAddresses": {
+            "value": []
+        },
+        "adRulesSourceAddresses": {
+            "value": []
+        },
+        "adRulesSourceIPGroups": {
+            "value": [
+                "<resource id of existing IP Groups01>",
+                "<resource id of existing IP Groups02>"
+            ]
+        },
+        "coreSysRulesDestinationIPGroups": {
+            "value": []
+        },
+        "coreSysRulesDestinationAddresses": {
+            "value": [
+                "*"
+            ]
+        },
+        "coreSysRulesSourceAddresses": {
+            "value": []
+        },
+        "coreSysRulesSourceIPGroups": {
+            "value": [
+                "<resource id of existing IP Groups01>",
+                "<resource id of existing IP Groups02>"
+            ]
+        },
+        "coreRuleCollectionGroupPriority":{
+            "value": 100
+        },
+        "firewallPolicySku": {
+            "value": "Standard"
+        },
+        "dnsEnableProxy":{
+            "value": true
+        },
+        "dnsServersIPAddresses":{
+            "value": [
+                "127.0.0.1"
+            ]
+        },
+        "fwPolicyPrivateIPAddresses": {
+            "value": [
+                "10.0.0.0/8",
+                "172.16.0.0/12",
+                "192.168.0.0/16",
+                "100.64.0.0/10"
+            ]
+        },
+        "snowRulesDestinationIPGroups": {
+            "value": [
+                "<resource id of existing IP Groups01>",
+                "<resource id of existing IP Groups02>"
+            ]
+        },
+        "snowRulesDestinationAddresses": {
+            "value": []
+        },
+        "snowRulesSourceAddresses": {
+            "value": []
+        },
+        "snowRulesSourceIPGroups": {
+            "value": [
+                "<resource id of existing IP Groups01>",
+                "<resource id of existing IP Groups02>"
+            ]
+        }
+    }
+}

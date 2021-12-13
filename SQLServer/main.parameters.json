@@ -1,0 +1,92 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sqlName": {
+            "value": "rl-wu2-dev-sql-02"
+        },
+        "sqlAdministratorLogin": {
+            "value": "dbasqladmin"
+        },
+        "setAADAdmins": {
+            "value": false
+        },
+        "azureADOnlyAuthentication": {
+            "value": false
+        },
+        "principalType": {
+            "value": "Group"
+        },
+        "login": {
+            "value": ""
+        },
+        "sid": {
+            "value": ""
+        },
+        "tenantId": {
+            "value": ""
+        },
+        "publicNetworkAccess": {
+            "value": "Enabled"
+        },
+        "sqlKeyVaultSkuName": {
+            "value": "standard"
+        },
+        "sqlTDECustomerManagedKey":{
+            "value": false
+        },
+        "clientIPcidr": {
+            "value": "47.215.197.0/24"
+        },
+        "sqlVulnerabilityAssessmentRecurringScans": {
+            "value": true
+        },
+        "sqlVulnerabilityAssessmentRecurringScansEmailSubAdmins": {
+            "value": true
+        },
+        "sqlVulnerabilityAssessmentRecurringScansEmails": {
+            "value": [
+                "jill@foobar.com",
+                "jack@foobar.com"
+            ]
+        },
+        "sqlDatabases": {
+            "value": [
+                {
+                    "name": "dbaAdmin",
+                    "licenseType": "BasePrice",
+                    "sampleName": "",
+                    "dbShortTermRetentionDays": 7,
+                    "dbDiffBackupIntervalInHours": 12,
+                    "skuName": "Basic",
+                    "skuTier": "Basic",
+                    "skuFamily": "",
+                    "skuCapacity": 5
+                },
+                {
+                    "name": "adventureWorks",
+                    "licenseType": "BasePrice",
+                    "sampleName": "AdventureWorksLT",
+                    "dbShortTermRetentionDays": 2,
+                    "dbDiffBackupIntervalInHours": 12,
+                    "skuName": "S0",
+                    "skuTier": "Standard",
+                    "skuFamily": "",
+                    "skuCapacity": 10
+                }
+            ]
+        },
+        "sqlDBTags": {
+            "value": {
+                    "Environment": "Dev",                    
+                    "ApplicationName": "Sandbox",
+                    "DataClassification": "Level2",
+                    "Division": "ITS",
+                    "FiscalApprover": "Uncle John",
+                    "RegulatoryRequirement": "N/A",
+                    "Routing": "None",
+                    "TechnicalApprover": "Aunt Jane"
+                }
+        }
+    }
+}

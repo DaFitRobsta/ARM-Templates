@@ -1,0 +1,62 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vpnType": {
+            "value": "RouteBased"
+        },
+        "localGatewayName": {
+            "value": "ol-slm-lng01"
+        },
+        "localGatewayIpAddress": {
+            "value": "159.121.166.99"
+        },
+        "localAddressPrefix": {
+            "value": [
+              "10.21.0.0/16",
+              "10.9.0.0/16",
+              "167.131.0.0/16",
+              "159.121.0.0/16"
+            ]
+        },
+        "virtualNetworkName": {
+            "value": "ol-hub-vnet01"
+        },
+        "azureVNetAddressPrefix": {
+            "value": "10.35.26.0/24"
+        },
+        "bastionSubnetPrefix": {
+            "value": "10.35.26.0/27"
+        },
+        "gatewaySubnetPrefix": {
+            "value": "10.35.26.32/27"
+        },
+        "firewallSubnetPrefix": {
+            "value": "10.35.26.64/26"
+        },
+        "sharedServicesSubnetName": {
+            "value": "shared-services-sn"
+        },
+        "sharedServicesSubnetPrefix": {
+            "value": "10.35.26.128/26"
+        },
+        "gatewayPublicIPName": {
+            "value": "odot-test-vpn01-PIP"
+        },
+        "gatewayName": {
+            "value": "odot-test-vpn01"
+        },
+        "gatewaySku": {
+            "value": "VpnGw2"
+        },
+        "vpnGatewayGeneration": {
+            "value": "Generation2"
+        },
+        "connectionName": {
+            "value": "ol-hub-to-slm"
+        },
+        "sharedKey": {
+            "value": "" // TODO: Fill in parameter value
+        }
+    }
+}

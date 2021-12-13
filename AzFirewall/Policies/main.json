@@ -1,0 +1,817 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.4.613.9944",
+      "templateHash": "10510616639246574465"
+    }
+  },
+  "parameters": {
+    "policyName": {
+      "type": "string",
+      "defaultValue": "CoreFWPolicy",
+      "metadata": {
+        "description": "Name of the Firewall Policy"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "parentPolicyId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Parent Firewall Policy Id"
+      }
+    },
+    "threatIntelMode": {
+      "type": "string",
+      "defaultValue": "Deny",
+      "metadata": {
+        "description": "The operation mode for Threat Intelligence. - Alert, Deny, Off"
+      },
+      "allowedValues": [
+        "Alert",
+        "Deny",
+        "Off"
+      ]
+    },
+    "threatIntelWhiteListIpAddresses": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "List of IP addresses for the ThreatIntel Whitelist. - comma seperated quoted IP addresses"
+      }
+    },
+    "threatIntelWhiteListFQDNs": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "List of FQDNs for the ThreatIntel Whitelist. - comma seperated quoted FQDNs"
+      }
+    },
+    "dnsServersIPAddresses": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "List of Custom DNS Servers - comma seperated quoted IP addresses"
+      }
+    },
+    "dnsEnableProxy": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Enable DNS Proxy on Firewalls attached to the Firewall Policy."
+      }
+    },
+    "firewallPolicySku": {
+      "type": "string",
+      "defaultValue": "Standard",
+      "metadata": {
+        "description": "Tier of Firewall Policy. - Standard or Premium"
+      },
+      "allowedValues": [
+        "Standard",
+        "Premium"
+      ]
+    },
+    "fwPolicyPrivateIPAddresses": {
+      "type": "array",
+      "defaultValue": [
+        "10.0.0.0/8",
+        "172.16.0.0/12",
+        "192.168.0.0/16",
+        "100.64.0.0/10"
+      ],
+      "metadata": {
+        "description": "Private IP ranges (SNAT) that will not be SNAT'd by the Az Firewall"
+      }
+    },
+    "adRulesDestinationAddresses": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "List of Destination AD DS Server IP Addresses or range - comma seperated quoted IP addresses"
+      }
+    },
+    "adRulesDestinationIPGroups": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "List of Destination AD DS Server IP Group(s) - comma seperated quoted IP Groups ID(s)"
+      }
+    },
+    "adRulesSourceAddresses": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "List of Source AD DS Server IP Addresses or range - comma seperated quoted IP addresses"
+      }
+    },
+    "adRulesSourceIPGroups": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "List of Source AD DS Server IP Group(s) - comma seperated quoted IP Groups ID(s)"
+      }
+    },
+    "coreSysRulesDestinationAddresses": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "For the Core Systems Rules, set the destination addresses in comma seperated quoted IP addresses"
+      }
+    },
+    "coreSysRulesDestinationIPGroups": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "For the Core Systems Rules, set the destination IP Groups resource Id in comma seperated quoted IDs"
+      }
+    },
+    "coreSysRulesSourceAddresses": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "For the Core Systems Rules, set the source addresses in comma seperated quoted IP addresses"
+      }
+    },
+    "coreSysRulesSourceIPGroups": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "For the Core Systems Rules, set the source IP Groups resource Id in comma seperated quoted IDs"
+      }
+    },
+    "coreRuleCollectionGroupPriority": {
+      "type": "int",
+      "defaultValue": 100,
+      "metadata": {
+        "description": "Priority of the Core Infrastructrue Rule Collection Group"
+      }
+    },
+    "assetDiscoveryRCGPriority": {
+      "type": "int",
+      "defaultValue": 200,
+      "metadata": {
+        "description": "Priority of the Asset Rule Collection Group"
+      }
+    },
+    "snowRulesDestinationAddresses": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "For the Snow Discovery Rules, set the destination addresses in comma seperated quoted IP addresses"
+      }
+    },
+    "snowRulesDestinationIPGroups": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "For the Snow Discovery Rules, set the destination IP Groups resource Id in comma seperated quoted IDs"
+      }
+    },
+    "snowRulesSourceAddresses": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "For the Snow Discovery Rules, set the source addresses in comma seperated quoted IP addresses"
+      }
+    },
+    "snowRulesSourceIPGroups": {
+      "type": "array",
+      "defaultValue": [],
+      "metadata": {
+        "description": "For the Snow Discovery Rules, set the source IP Groups resource Id in comma seperated quoted IDs"
+      }
+    }
+  },
+  "functions": [],
+  "resources": [
+    {
+      "type": "Microsoft.Network/firewallPolicies",
+      "apiVersion": "2020-11-01",
+      "name": "[parameters('policyName')]",
+      "location": "[parameters('location')]",
+      "tags": {},
+      "properties": {
+        "basePolicy": {
+          "id": "[parameters('parentPolicyId')]"
+        },
+        "threatIntelMode": "[parameters('threatIntelMode')]",
+        "threatIntelWhitelist": {
+          "ipAddresses": "[parameters('threatIntelWhiteListIpAddresses')]",
+          "fqdns": "[parameters('threatIntelWhiteListFQDNs')]"
+        },
+        "dnsSettings": {
+          "servers": "[parameters('dnsServersIPAddresses')]",
+          "enableProxy": "[parameters('dnsEnableProxy')]"
+        },
+        "sku": {
+          "tier": "[parameters('firewallPolicySku')]"
+        },
+        "snat": {
+          "privateRanges": "[parameters('fwPolicyPrivateIPAddresses')]"
+        }
+      }
+    },
+    {
+      "condition": "[and(or(and(not(empty(parameters('adRulesDestinationAddresses'))), empty(parameters('adRulesDestinationIPGroups'))), and(empty(parameters('adRulesDestinationAddresses')), not(empty(parameters('adRulesDestinationIPGroups'))))), or(and(not(empty(parameters('adRulesSourceAddresses'))), empty(parameters('adRulesSourceIPGroups'))), and(empty(parameters('adRulesSourceAddresses')), not(empty(parameters('adRulesSourceIPGroups'))))))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "coreInfrastructureRCG",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "fwPolicyName": {
+            "value": "[parameters('policyName')]"
+          },
+          "adRulesDestinationAddresses": {
+            "value": "[if(empty(parameters('adRulesDestinationAddresses')), createArray(), parameters('adRulesDestinationAddresses'))]"
+          },
+          "adRulesDestinationIPGroups": {
+            "value": "[if(empty(parameters('adRulesDestinationIPGroups')), createArray(), parameters('adRulesDestinationIPGroups'))]"
+          },
+          "adRulesSourceAddresses": {
+            "value": "[if(empty(parameters('adRulesSourceAddresses')), createArray(), parameters('adRulesSourceAddresses'))]"
+          },
+          "adRulesSourceIPGroups": {
+            "value": "[if(empty(parameters('adRulesSourceIPGroups')), createArray(), parameters('adRulesSourceIPGroups'))]"
+          },
+          "coreSysRulesDestinationAddresses": {
+            "value": "[if(empty(parameters('coreSysRulesDestinationAddresses')), createArray(), parameters('coreSysRulesDestinationAddresses'))]"
+          },
+          "coreSysRulesDestinationIPGroups": {
+            "value": "[if(empty(parameters('coreSysRulesDestinationIPGroups')), createArray(), parameters('coreSysRulesDestinationIPGroups'))]"
+          },
+          "coreSysRulesSourceAddresses": {
+            "value": "[if(empty(parameters('coreSysRulesSourceAddresses')), createArray(), parameters('coreSysRulesSourceAddresses'))]"
+          },
+          "coreSysRulesSourceIPGroups": {
+            "value": "[if(empty(parameters('coreSysRulesSourceIPGroups')), createArray(), parameters('coreSysRulesSourceIPGroups'))]"
+          },
+          "coreRuleCollectionGroupPriority": {
+            "value": "[parameters('coreRuleCollectionGroupPriority')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.613.9944",
+              "templateHash": "9155894575450798055"
+            }
+          },
+          "parameters": {
+            "fwPolicyName": {
+              "type": "string",
+              "defaultValue": "BaseFWPolicy",
+              "metadata": {
+                "description": "Name of the Policy this rule collection belongs"
+              }
+            },
+            "adRulesDestinationAddresses": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "For the AD Rules, set the destination addresses in comma seperated quoted IP addresses"
+              }
+            },
+            "adRulesDestinationIPGroups": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "For the AD Rules, set the destination IP Groups resource Id in comma seperated quoted IDs"
+              }
+            },
+            "adRulesSourceAddresses": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "For the AD Rules, set the source addresses in comma seperated quoted IP addresses"
+              }
+            },
+            "adRulesSourceIPGroups": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "For the AD Rules, set the source IP Groups resource Id in comma seperated quoted IDs"
+              }
+            },
+            "coreSysRulesDestinationAddresses": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "For the Core Systems Rules, set the destination addresses in comma seperated quoted IP addresses"
+              }
+            },
+            "coreSysRulesDestinationIPGroups": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "For the Core Systems Rules, set the destination IP Groups resource Id in comma seperated quoted IDs"
+              }
+            },
+            "coreSysRulesSourceAddresses": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "For the Core Systems Rules, set the source addresses in comma seperated quoted IP addresses"
+              }
+            },
+            "coreSysRulesSourceIPGroups": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "For the Core Systems Rules, set the source IP Groups resource Id in comma seperated quoted IDs"
+              }
+            },
+            "coreRuleCollectionGroupPriority": {
+              "type": "int",
+              "defaultValue": 100,
+              "metadata": {
+                "description": "Priority of the AD Rule Collection Group"
+              }
+            }
+          },
+          "functions": [],
+          "variables": {
+            "adRulesPriority": "[parameters('coreRuleCollectionGroupPriority')]",
+            "coreSystemsRulesPriority": "[add(variables('adRulesPriority'), 5)]",
+            "coreSystemsApplicationRulesPriority": "[add(variables('coreSystemsRulesPriority'), 5)]",
+            "blobStorage": "[format('*.blob.{0}', environment().suffixes.storage)]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/firewallPolicies/ruleCollectionGroups",
+              "apiVersion": "2020-11-01",
+              "name": "[format('{0}/CoreInfrastructureRCG', parameters('fwPolicyName'))]",
+              "properties": {
+                "priority": "[parameters('coreRuleCollectionGroupPriority')]",
+                "ruleCollections": [
+                  {
+                    "name": "ActiveDirectoryRules",
+                    "priority": "[variables('adRulesPriority')]",
+                    "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+                    "action": {
+                      "type": "Allow"
+                    },
+                    "rules": [
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "NTP",
+                        "ipProtocols": [
+                          "UDP"
+                        ],
+                        "destinationAddresses": "[parameters('adRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('adRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "123"
+                        ],
+                        "sourceAddresses": "[parameters('adRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('adRulesSourceIPGroups')]"
+                      },
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "RPC",
+                        "ipProtocols": [
+                          "TCP"
+                        ],
+                        "destinationAddresses": "[parameters('adRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('adRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "135"
+                        ],
+                        "sourceAddresses": "[parameters('adRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('adRulesSourceIPGroups')]"
+                      },
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "Kerberos password change",
+                        "ipProtocols": [
+                          "TCP",
+                          "UDP"
+                        ],
+                        "destinationAddresses": "[parameters('adRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('adRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "464"
+                        ],
+                        "sourceAddresses": "[parameters('adRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('adRulesSourceIPGroups')]"
+                      },
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "RPC for LSA, SAM, NetLogon",
+                        "ipProtocols": [
+                          "TCP"
+                        ],
+                        "destinationAddresses": "[parameters('adRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('adRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "49152-65535"
+                        ],
+                        "sourceAddresses": "[parameters('adRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('adRulesSourceIPGroups')]"
+                      },
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "LDAP",
+                        "ipProtocols": [
+                          "TCP",
+                          "UDP"
+                        ],
+                        "destinationAddresses": "[parameters('adRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('adRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "389"
+                        ],
+                        "sourceAddresses": "[parameters('adRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('adRulesSourceIPGroups')]"
+                      },
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "LDAP SSL",
+                        "ipProtocols": [
+                          "TCP"
+                        ],
+                        "destinationAddresses": "[parameters('adRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('adRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "636"
+                        ],
+                        "sourceAddresses": "[parameters('adRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('adRulesSourceIPGroups')]"
+                      },
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "LDAP GC",
+                        "ipProtocols": [
+                          "TCP"
+                        ],
+                        "destinationAddresses": "[parameters('adRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('adRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "3268"
+                        ],
+                        "sourceAddresses": "[parameters('adRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('adRulesSourceIPGroups')]"
+                      },
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "LDAP GC SSL",
+                        "ipProtocols": [
+                          "TCP"
+                        ],
+                        "destinationAddresses": "[parameters('adRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('adRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "3269"
+                        ],
+                        "sourceAddresses": "[parameters('adRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('adRulesSourceIPGroups')]"
+                      },
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "DNS",
+                        "ipProtocols": [
+                          "TCP",
+                          "UDP"
+                        ],
+                        "destinationAddresses": "[parameters('adRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('adRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "53"
+                        ],
+                        "sourceAddresses": "[parameters('adRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('adRulesSourceIPGroups')]"
+                      },
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "FRS RPC",
+                        "ipProtocols": [
+                          "TCP"
+                        ],
+                        "destinationAddresses": "[parameters('adRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('adRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "49252 - 65535"
+                        ],
+                        "sourceAddresses": "[parameters('adRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('adRulesSourceIPGroups')]"
+                      },
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "Kerberos",
+                        "ipProtocols": [
+                          "TCP",
+                          "UDP"
+                        ],
+                        "destinationAddresses": "[parameters('adRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('adRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "88"
+                        ],
+                        "sourceAddresses": "[parameters('adRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('adRulesSourceIPGroups')]"
+                      },
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "SMB",
+                        "ipProtocols": [
+                          "TCP"
+                        ],
+                        "destinationAddresses": "[parameters('adRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('adRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "445"
+                        ],
+                        "sourceAddresses": "[parameters('adRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('adRulesSourceIPGroups')]"
+                      },
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "DFSR RPC",
+                        "ipProtocols": [
+                          "TCP"
+                        ],
+                        "destinationAddresses": "[parameters('adRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('adRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "49152 - 65535"
+                        ],
+                        "sourceAddresses": "[parameters('adRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('adRulesSourceIPGroups')]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "coreSystemsRules",
+                    "priority": "[variables('coreSystemsRulesPriority')]",
+                    "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+                    "action": {
+                      "type": "Allow"
+                    },
+                    "rules": [
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "RemoteDesktop",
+                        "ipProtocols": [
+                          "TCP"
+                        ],
+                        "destinationAddresses": "[parameters('coreSysRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('coreSysRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "3389"
+                        ],
+                        "sourceAddresses": "[parameters('coreSysRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('coreSysRulesSourceIPGroups')]"
+                      },
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "ICMP-Pingers",
+                        "ipProtocols": [
+                          "ICMP"
+                        ],
+                        "destinationAddresses": "[parameters('coreSysRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('coreSysRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "*"
+                        ],
+                        "sourceAddresses": "[parameters('coreSysRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('coreSysRulesSourceIPGroups')]"
+                      }
+                    ]
+                  },
+                  {
+                    "name": "coreSystemsApplicationRules",
+                    "priority": "[variables('coreSystemsApplicationRulesPriority')]",
+                    "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+                    "action": {
+                      "type": "Allow"
+                    },
+                    "rules": [
+                      {
+                        "ruleType": "ApplicationRule",
+                        "name": "AllowLogAnalytics",
+                        "protocols": [
+                          {
+                            "protocolType": "Https",
+                            "port": 443
+                          }
+                        ],
+                        "destinationAddresses": [],
+                        "fqdnTags": [],
+                        "targetFqdns": [
+                          "*.ods.opinsights.azure.com",
+                          "*.oms.opinsights.azure.com",
+                          "[variables('blobStorage')]",
+                          "*.azure-automation.net"
+                        ],
+                        "sourceAddresses": [
+                          "*"
+                        ],
+                        "sourceIpGroups": []
+                      },
+                      {
+                        "ruleType": "ApplicationRule",
+                        "name": "AllowAzurePaaSServices",
+                        "protocols": [],
+                        "destinationAddresses": [],
+                        "fqdnTags": [
+                          "WindowsDiagnostics",
+                          "AzureBackup",
+                          "MicrosoftActiveProtectionService",
+                          "WindowsUpdate",
+                          "WindowsVirtualDesktop"
+                        ],
+                        "targetFqdns": [],
+                        "sourceAddresses": [
+                          "*"
+                        ],
+                        "sourceIpGroups": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/firewallPolicies', parameters('policyName'))]"
+      ]
+    },
+    {
+      "condition": "[and(or(and(not(empty(parameters('snowRulesDestinationAddresses'))), empty(parameters('snowRulesDestinationIPGroups'))), and(empty(parameters('snowRulesDestinationAddresses')), not(empty(parameters('snowRulesDestinationIPGroups'))))), or(and(not(empty(parameters('snowRulesSourceAddresses'))), empty(parameters('snowRulesSourceIPGroups'))), and(empty(parameters('snowRulesSourceAddresses')), not(empty(parameters('snowRulesSourceIPGroups'))))))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "assetDiscoveryRCG",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "fwPolicyName": {
+            "value": "[parameters('policyName')]"
+          },
+          "snowRulesDestinationAddresses": {
+            "value": "[if(empty(parameters('snowRulesDestinationAddresses')), createArray(), parameters('snowRulesDestinationAddresses'))]"
+          },
+          "snowRulesDestinationIPGroups": {
+            "value": "[if(empty(parameters('snowRulesDestinationIPGroups')), createArray(), parameters('snowRulesDestinationIPGroups'))]"
+          },
+          "snowRulesSourceAddresses": {
+            "value": "[if(empty(parameters('snowRulesSourceAddresses')), createArray(), parameters('snowRulesSourceAddresses'))]"
+          },
+          "snowRulesSourceIPGroups": {
+            "value": "[if(empty(parameters('snowRulesSourceIPGroups')), createArray(), parameters('snowRulesSourceIPGroups'))]"
+          },
+          "assetDiscoveryRCGPriority": {
+            "value": "[parameters('assetDiscoveryRCGPriority')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.613.9944",
+              "templateHash": "5302282213371269618"
+            }
+          },
+          "parameters": {
+            "fwPolicyName": {
+              "type": "string",
+              "defaultValue": "BaseFWPolicy",
+              "metadata": {
+                "description": "Name of the Policy this rule collection belongs"
+              }
+            },
+            "assetDiscoveryRCGPriority": {
+              "type": "int",
+              "defaultValue": 200,
+              "metadata": {
+                "description": "Priority of the Asset Rule Collection Group"
+              }
+            },
+            "snowRulesDestinationAddresses": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "For the Snow Discovery Rules, set the destination addresses in comma seperated quoted IP addresses"
+              }
+            },
+            "snowRulesDestinationIPGroups": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "For the Snow Discovery Rules, set the destination IP Groups resource Id in comma seperated quoted IDs"
+              }
+            },
+            "snowRulesSourceAddresses": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "For the Snow Discovery Rules, set the source addresses in comma seperated quoted IP addresses"
+              }
+            },
+            "snowRulesSourceIPGroups": {
+              "type": "array",
+              "defaultValue": [],
+              "metadata": {
+                "description": "For the Snow Discovery Rules, set the source IP Groups resource Id in comma seperated quoted IDs"
+              }
+            }
+          },
+          "functions": [],
+          "variables": {
+            "snowDiscoveryRulesPriority": "[parameters('assetDiscoveryRCGPriority')]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/firewallPolicies/ruleCollectionGroups",
+              "apiVersion": "2021-02-01",
+              "name": "[format('{0}/AssetDiscoveryRCG', parameters('fwPolicyName'))]",
+              "properties": {
+                "priority": "[parameters('assetDiscoveryRCGPriority')]",
+                "ruleCollections": [
+                  {
+                    "name": "ServiceNowDiscoveryRules",
+                    "priority": "[variables('snowDiscoveryRulesPriority')]",
+                    "ruleCollectionType": "FirewallPolicyFilterRuleCollection",
+                    "action": {
+                      "type": "Allow"
+                    },
+                    "rules": [
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "RemotePowerShell",
+                        "ipProtocols": [
+                          "TCP"
+                        ],
+                        "destinationAddresses": "[parameters('snowRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('snowRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "5985-5986"
+                        ],
+                        "sourceAddresses": "[parameters('snowRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('snowRulesSourceIPGroups')]"
+                      },
+                      {
+                        "ruleType": "NetworkRule",
+                        "name": "SSH",
+                        "ipProtocols": [
+                          "TCP"
+                        ],
+                        "destinationAddresses": "[parameters('snowRulesDestinationAddresses')]",
+                        "destinationIpGroups": "[parameters('snowRulesDestinationIPGroups')]",
+                        "destinationFqdns": [],
+                        "destinationPorts": [
+                          "22"
+                        ],
+                        "sourceAddresses": "[parameters('snowRulesSourceAddresses')]",
+                        "sourceIpGroups": "[parameters('snowRulesSourceIPGroups')]"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/firewallPolicies', parameters('policyName'))]",
+        "[resourceId('Microsoft.Resources/deployments', 'coreInfrastructureRCG')]"
+      ]
+    }
+  ]
+}

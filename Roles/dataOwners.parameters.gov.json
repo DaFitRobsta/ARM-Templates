@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "roleName": {
+            "value": "[OR] OIS DRM Contributor"
+        },
+        "roleDescription": {
+            "value": "Contributor role for DRM managed subscriptions"
+        },
+        "assignableScopes": {
+            "value": [
+                    "/subscriptions/5a201797-adc9-4a00-8562-94b13e2841fe"
+            ]
+        },
+        "actions": {
+            "metadata": {
+                "comment": "Had to remove the following resource providers as they aren't available in Gov: Microsoft.MachineLearning, Microsoft.Purview"
+            },
+            "value": [
+                "*/read",
+                "Microsoft.Resources/deployments/*",
+                "Microsoft.Resources/subscriptions/resourceGroups/*",
+                "Microsoft.Network/networkSecurityGroups/*",
+                "Microsoft.Network/routeTables/*",
+                "Microsoft.Network/virtualNetworks/subnets/*",
+                "Microsoft.DataFactory/*",
+                "Microsoft.DataMigration/*",
+                "Microsoft.Sql/*",
+                "Microsoft.SqlVirtualMachine/*",
+                "Microsoft.AnalysisServices/*",
+                "Microsoft.Databricks/*",
+                "Microsoft.Synapse/*",
+                "Microsoft.MachineLearningServices/*",
+                "Microsoft.Migrate/*",
+                "Microsoft.AlertsManagement/*",
+                "Microsoft.Insights/*",
+                "Microsoft.Storage/*",
+                "Microsoft.ManagedIdentity/*",
+                "Microsoft.Support/*",
+                "Microsoft.Compute/*",
+                "Microsoft.Network/privateEndpoints/*",
+                "Microsoft.KeyVault/*"
+            ]
+        },
+        "notActions": {
+            "value": []
+        },
+        "dataActions": {
+            "value": []
+        },
+        "notDataActions": {
+            "value": []
+        }
+    }
+}

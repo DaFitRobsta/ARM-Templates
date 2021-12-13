@@ -1,0 +1,264 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vpnType": {
+      "type": "string",
+      "metadata": {
+        "description": "Route based or policy based"
+      },
+      "defaultValue": "RouteBased",
+      "allowedValues": [
+        "RouteBased",
+        "PolicyBased"
+      ]
+    },
+    "localGatewayName": {
+      "type": "string",
+      "defaultValue": "ol-slm-lng01",
+      "metadata": {
+        "description": "Arbitrary name for gateway resource representing "
+      }
+    },
+    "localGatewayIpAddress": {
+      "type": "string",
+      "defaultValue": "159.121.166.99",
+      "metadata": {
+        "description": "Public IP of your CheckPoint Firewall"
+      }
+    },
+    "localAddressPrefix": {
+      "type": "array",
+      "defaultValue": [
+        "10.21.0.0/16",
+        "10.9.0.0/16",
+        "167.131.0.0/16",
+        "159.121.0.0/16"
+      ],
+      "metadata": {
+        "description": "CIDR block representing the address space of the OnPremises VPN network's Subnet(s)"
+      }
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "ol-hub-vnet01",
+      "metadata": {
+        "description": "Arbitrary name for the Azure Virtual Network"
+      }
+    },
+    "azureVNetAddressPrefix": {
+      "type": "string",
+      "defaultValue": "10.35.26.0/24",
+      "metadata": {
+        "description": "CIDR block representing the address space of the Azure Hub VNet"
+      }
+    },
+    "bastionSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.35.26.0/27",
+      "metadata": {
+        "description": "CIDR block for Azure Bastion subnet, subset of azureVNetAddressPrefix address space"
+      }
+    },
+    "gatewaySubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.35.26.32/27",
+      "metadata": {
+        "description": "CIDR block for gateway subnet, subset of azureVNetAddressPrefix address space"
+      }
+    },    
+    "firewallSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.35.26.64/26",
+      "metadata": {
+        "description": "CIDR block for Azure Firewall subnet, subset of azureVNetAddressPrefix address space"
+      }
+    },        
+    "sharedServicesSubnetName": {
+      "type": "string",
+      "defaultValue": "shared-services-sn",
+      "metadata": {
+        "description": "Arbitrary name for the Shared Services Subnet"
+      }
+    },
+    "sharedServicesSubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.35.26.128/26",
+      "metadata": {
+        "description": "CIDR block for Shared Services subnet, subset of azureVNetAddressPrefix address space"
+      }
+    },
+    "gatewayPublicIPName": {
+      "type": "string",
+      "defaultValue": "odot-test-vpn01-PIP",
+      "metadata": {
+        "description": "Arbitrary name for public IP resource used for the new azure gateway"
+      }
+    },
+    "gatewayName": {
+      "type": "string",
+      "defaultValue": "odot-test-vpn01",
+      "metadata": {
+        "description": "Arbitrary name for the new gateway"
+      }
+    },
+    "gatewaySku": {
+      "type": "string",
+      "defaultValue": "VpnGw2",
+      "allowedValues": [
+        "VpnGw1",
+        "VpnGw2",
+        "VpnGw3",
+        "VpnGw4",
+        "VpnGw5"
+      ],
+      "metadata": {
+        "description": "The Sku of the Gateway. This must be one of VpnGw2, VpnGw3, VpnGw4, or VpnGw5."
+      }
+    },
+    "vpnGatewayGeneration": {
+      "type": "string",
+      "defaultValue": "Generation2",
+      "allowedValues": [
+        "Generation2",
+        "Generation1"
+      ],
+      "metadata": {
+        "description": "The Generation of the Gateway. This must be one of Generation1 or Generation2."
+      }
+    },
+    "connectionName": {
+      "type": "string",
+      "defaultValue": "ol-hub-to-slm",
+      "metadata": {
+        "description": "Arbitrary name for the new connection between Azure VNet and other network"
+      }
+    },
+    "sharedKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Shared key (PSK) for IPSec tunnel"
+      }
+    }
+  },
+  "variables": {
+    "gatewaySubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', parameters('virtualNetworkName'),'GatewaySubnet')]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2020-04-01",
+      "type": "Microsoft.Network/localNetworkGateways",
+      "name": "[parameters('localGatewayName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "localNetworkAddressSpace": {
+          "addressPrefixes": "[parameters('localAddressPrefix')]"
+        },
+        "gatewayIpAddress": "[parameters('localGatewayIpAddress')]"
+      }
+    },
+    {
+      "apiVersion": "2020-04-01",
+      "name": "[parameters('connectionName')]",
+      "type": "Microsoft.Network/connections",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworkGateways/', parameters('gatewayName'))]",
+        "[concat('Microsoft.Network/localNetworkGateways/', parameters('localGatewayName'))]"
+      ],
+      "properties": {
+        "virtualNetworkGateway1": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('gatewayName'))]"
+        },
+        "localNetworkGateway2": {
+          "id": "[resourceId('Microsoft.Network/localNetworkGateways', parameters('localGatewayName'))]"
+        },
+        "connectionType": "IPsec",
+        "routingWeight": 10,
+        "sharedKey": "[parameters('sharedKey')]"
+      }
+    },
+    {
+      "apiVersion": "2020-04-01",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworkName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('azureVNetAddressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('sharedServicesSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('sharedServicesSubnetPrefix')]"
+            }
+          },
+          {
+            "name": "AzureBastionSubnet",
+            "properties":{
+              "addressPrefix": "[parameters('bastionSubnetPrefix')]"
+            }
+          },
+          {
+            "name": "GatewaySubnet",
+            "properties": {
+              "addressPrefix": "[parameters('gatewaySubnetPrefix')]"
+            }
+          },
+          {
+            "name":"AzureFirewallSubnet",
+            "properties": {
+              "addressPrefix":"[parameters('firewallSubnetPrefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2020-04-01",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[parameters('gatewayPublicIPName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic"
+      }
+    },
+    {
+      "apiVersion": "2020-04-01",
+      "type": "Microsoft.Network/virtualNetworkGateways",
+      "name": "[parameters('gatewayName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', parameters('gatewayPublicIPName'))]",
+        "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('gatewaySubnetRef')]"
+              },
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('gatewayPublicIPName'))]"
+              }
+            },
+            "name": "vnetGatewayConfig"
+          }
+        ],
+        "sku": {
+          "name": "[parameters('gatewaySku')]",
+          "tier": "[parameters('gatewaySku')]"
+        },
+        "vpnGatewayGeneration": "[parameters('vpnGatewayGeneration')]",
+        "gatewayType": "Vpn",
+        "vpnType": "[parameters('vpnType')]",
+        "enableBgp": "false"
+      }
+    }
+  ]
+}

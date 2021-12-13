@@ -1,0 +1,8 @@
+AzFirewall/Policies/main.sl.parameters.json
+AzFirewall/Policies/main.rolight.parameters.json
+SQLMI/ARM/parameters.json
+SQLMI/ARM/template.json
+SQLMI/main.parameters.gov.json
+SQLMI/main.parameters.airs.json
+SQLServer/main.parameters.airs.json
+SQLServer/main.parameters.airs.aad.json

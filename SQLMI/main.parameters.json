@@ -1,0 +1,102 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sqlManagedInstanceName": {
+            "value": "dz-wu2-dev-sqlmi-01"
+        },
+        "sqlManagedInstanceSkuEdition":{
+            "value": "GeneralPurpose"
+        },
+        "sqlManagedInstanceSkuName":{
+            "value": "GP_Gen5"
+        },
+        "sqlManagedInstanceHardwareFamily":{
+            "value": "Gen5"
+        },
+        "vnetName": {
+            "value": "dz-wu2-net-np-vnet02"
+        },
+        "vnetResourceGroupName": {
+            "value": "dz-wu2-net-np-rg02"
+        },
+        "managedInstanceSubnetName": {
+            "value": "sqlmi-sn"
+        },
+        "sqlManagedInstanceAdminLogin": {
+            "value": "dzAdmin"
+        },
+        "sqlManagedInstanceStorageSizeInGB":{
+            "value": 32
+        },
+        "sqlManagedInstanceStorageAccountType":{
+            "value": "LRS"
+        },
+        "sqlManagedInstancevCores":{
+            "value": 4
+        },
+        "sqlManagedInstanceLicenseType":{
+            "value": "BasePrice"
+        },
+        "sqlManagedInstanceCollation":{
+            "value": "SQL_Latin1_General_CP1_CI_AS"
+        },
+        "sqlManagedInstanceTimeZoneId":{
+            "value": "Pacific Standard Time"
+        },
+        "sqlManagedInstanceProxyOverride":{
+            "value": "Redirect"
+        },
+        "sqlManagedInstanceEnableAADAuthentication": {
+            "value": false
+        },
+        "sqlManagedInstanceAdministratorAADLogin": {
+            "value": ""
+        },
+        "sqlManagedInstanceAdministratorAADSID": {
+            "value": ""
+        },
+        "sqlManagedInstanceAdministratorAADTenantID": {
+            "value": ""
+        },        
+        "sqlManagedInstanceTags": {
+            "value": {
+                    "Environment": "Dev",
+                    "Project": "Demo"
+                }
+        },
+        "sqlMIDatabaseNames": {
+            "value": [
+                "WorkDB",
+                "ForMando",
+                "ForAlex",
+                "ForJeffrey",
+                "ForTheFeds"
+            ]
+        },
+        "dbRetentionDays": {
+            "value": 3
+        },
+        "sqlmiVulnerabilityAssessmentRecurringScans": {
+            "value": true
+        },
+        "sqlmiVulnerabilityAssessmentRecurringScansEmailSubAdmins": {
+            "value": true
+        },
+        "sqlmiVulnerabilityAssessmentRecurringScansEmails": {
+            "value": [
+                "joe@bar.com",
+                "jack@foo.bar.com"
+            ]
+        },
+        "clientIPcidr":{
+            "value": ""
+        },
+        "sqlmiKeyVaultSkuName":{
+            "value": "standard"
+        },
+        "sqlmiTDECustomerManagedKey":{
+            "value": false
+        }
+    }
+}
