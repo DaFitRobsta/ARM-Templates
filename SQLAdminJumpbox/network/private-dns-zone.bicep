@@ -5,16 +5,20 @@ param privateDnsZoneNames array = [
 
 param vnetId string
 param vnetName string
+@description('Tags for deployed resources.')
+param Tags object = {}
 
 resource createPrivateDnsZones 'Microsoft.Network/privateDnsZones@2020-06-01' = [for zone in privateDnsZoneNames: {
   name: zone
   location: 'global'
+  tags: Tags
 }]
 
 resource createPrivateDnsZoneVirtualLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = [for (zone, index) in privateDnsZoneNames: {
   name: '${vnetName}-link'
   parent: createPrivateDnsZones[index]
   location: 'global'
+  tags: Tags
   dependsOn: [
     createPrivateDnsZones
   ]

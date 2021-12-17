@@ -3,14 +3,22 @@ param location string = resourceGroup().location
 param storSKU string = 'Standard_LRS'
 param storKind string = 'StorageV2'
 param subnetIDs array = []
-param clientIPcidr string
+param clientIPcidr array = []
 
-var clientAllowRule = [
+@description('Tags for deployed resources.')
+param Tags object = {}
+
+var clientAllowRule = [for IP in clientIPcidr: {
+  action: 'Allow'
+  value: IP
+} ]
+
+/* var clientAllowRule = [
   {
     action: 'Allow'
     value: clientIPcidr
   }
-]
+] */
 
 var vnetRules = [for (subnet, index) in subnetIDs: {
     id: subnet
@@ -20,6 +28,7 @@ var vnetRules = [for (subnet, index) in subnetIDs: {
 resource sqlStorageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   name: storName
   location: location
+  tags: Tags
   sku: {
     name: storSKU
   }
@@ -42,5 +51,5 @@ resource sqlStorageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
 output storageAccountBlobUri string = sqlStorageAccount.properties.primaryEndpoints.blob
 output storageAccountId string = sqlStorageAccount.id
 output blobStorageAccountFQDN string = split(sqlStorageAccount.properties.primaryEndpoints.blob, '/')[2]
-output storageAccountKey string = sqlStorageAccount.listKeys().keys[0].value
+// output storageAccountKey string = sqlStorageAccount.listKeys().keys[0].value
 output storageAccountName string = sqlStorageAccount.name

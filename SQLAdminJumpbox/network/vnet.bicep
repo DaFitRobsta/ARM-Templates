@@ -33,6 +33,9 @@ param subnets array = [
   }
 ]
 
+@description('Tags for deployed resources.')
+param Tags object = {}
+
 var subnetServiceEndpoints = [
   {
     service: 'Microsoft.Storage'
@@ -46,8 +49,7 @@ module createNSGs 'nsg.bicep' = [for subnet in subnets: {
   name: 'createNSG-${subnet.nsgName}'
   params: {
     location: location
-    tags: {
-    }
+    tags: Tags
     nsgName: subnet.nsgName
   }
 }]
@@ -55,6 +57,7 @@ module createNSGs 'nsg.bicep' = [for subnet in subnets: {
 resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
   name: vnetName
   location: location
+  tags: Tags
   properties: {
     addressSpace: {
       addressPrefixes: [

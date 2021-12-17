@@ -21,6 +21,13 @@
 param vmNamePrefix string
 @description('Number of SQL Admin VMs')
 param numberOfVMs int = 1
+param adminUsername string = 'adm.infra.usr'
+param storeAdminPasswordInKeyVault bool = false
+@description('List of client IP address(es) in CIDR notation')
+param clientIPcidr array = [
+  '134.114.0.0/16'
+  '8.8.8.8/32'
+]
 
 @description('VNet name')
 param vnetName string = 'nz-wu3-sqlAdmins-vnet01'
@@ -36,20 +43,28 @@ param setSubnetServiceEndpoints bool = true
 param subnets array = [
   {
     name: 'AzureBastionSubnet'
-    addressPrefix: '172.16.0.0/27'
+    addressPrefix: replace(vnetAddressPrefix, '/24', '/27') //'172.16.0.0/27'
     nsgName: '${vnetName}-bastion-nsg'
   }
   {
     name: vnetJumpboxSubnetName
-    addressPrefix: '172.16.0.32/27'
+    addressPrefix: '${substring(vnetAddressPrefix, 0, lastIndexOf(vnetAddressPrefix, '.'))}.32/27' //'172.16.0.32/27'
     nsgName: '${vnetName}-${vnetJumpboxSubnetName}-nsg'
   }
   {
     name: vnetPrivateEndpointSubnetName
-    addressPrefix: '172.16.0.64/26'
+    addressPrefix: '${substring(vnetAddressPrefix, 0, lastIndexOf(vnetAddressPrefix, '.'))}.64/26' //'172.16.0.64/26'
     nsgName: '${vnetName}-${vnetPrivateEndpointSubnetName}-nsg'
   }
 ]
+
+@description('Key Vault name')
+param sqlAdminKeyVaultName string ='kv-sqladm${uniqueString(resourceGroup().id)}'
+@allowed([
+  'standard'
+  'premium'
+])
+param sqlAdminKeyVaultSkuName string = 'standard'
 
 @description('Storage Account Name')
 param storageAccountName string = 'stasqladm${uniqueString(resourceGroup().id)}'
@@ -61,6 +76,9 @@ param privateDnsZoneNames array = [
 
 @description('Azure Bastion Resource Name')
 param bastionHostName string = 'sqlAdminBastion'
+
+@description('Tags for deployed resources.')
+param Tags object = {}
 
 var location = resourceGroup().location
 
@@ -74,6 +92,7 @@ module createVirtualNetwork 'network/vnet.bicep' = {
     vnetAddressPrefix: vnetAddressPrefix
     vnetPrivateEndpointSubnetName: vnetPrivateEndpointSubnetName
     setSubnetServiceEndpoints: setSubnetServiceEndpoints
+    Tags: Tags
   }
 }
 
@@ -84,9 +103,23 @@ module createPrivateDnsZonesAndLinks 'network/private-dns-zone.bicep' = {
     privateDnsZoneNames: privateDnsZoneNames
     vnetId: createVirtualNetwork.outputs.vnetId
     vnetName: vnetName
+    Tags: Tags
   }
 }
 
+// create SQL Admins Key Vault
+module createKeyVault 'keyvault/keyvault.bicep' = {
+  name: 'createKeyVault'
+  params: {
+    location: location
+    sqlAdminKeyVaultName: sqlAdminKeyVaultName
+    sqlAdminKeyVaultSkuName: sqlAdminKeyVaultSkuName
+    ipRules: [for IP in clientIPcidr:{
+      value: IP
+    } ]
+    Tags: Tags
+  }
+}
 
 // create SQL Admins storage account
 module createSqlAdminStorageAccount 'storageaccount/storageaccount.bicep' = {
@@ -95,11 +128,12 @@ module createSqlAdminStorageAccount 'storageaccount/storageaccount.bicep' = {
     createVirtualNetwork
   ]
   params: {
-    clientIPcidr: '134.114.0.0/16'
+    clientIPcidr: clientIPcidr
     storName: storageAccountName
     subnetIDs: [
       jumpboxSubnet.id
     ]
+    Tags: Tags
   }
 }
 
@@ -126,6 +160,7 @@ module createSqlAdminBlobStorageAccountPrivateEndpoint 'storageaccount/blobPriva
     blobStorageAccountPrivateEndpointName: '${createSqlAdminStorageAccount.outputs.storageAccountName}-pe'
     subnetId: privateEndpointSubnet.id
     privateDnsZoneConfigName: replace('privatelink.blob.${environment().suffixes.storage}','.', '-')
+    Tags: Tags
   }
 }
 
@@ -138,6 +173,7 @@ module createSqlBastion 'network/bastion.bicep' = {
     vnetSubnetNewOrExisting: 'existing'
     vnetName: createVirtualNetwork.outputs.vnetName
     location: location
+    Tags: Tags
   }
 }
 
@@ -155,6 +191,10 @@ module createSqlAdminJumpbox 'compute/jumpboxVM.bicep' = [for i in range(1, numb
   params: {
     location: location
     subnetRef: jumpboxSubnet.id
-    vmName: format('{0}-{1:00}', vmNamePrefix, i) 
+    vmName: format('{0}-{1:00}', vmNamePrefix, i)
+    sqlAdminKeyVaultName: createKeyVault.outputs.keyVaultName
+    adminUsername: adminUsername
+    storeAdminPasswordInKeyVault: storeAdminPasswordInKeyVault
+    Tags: Tags
   }
 }]

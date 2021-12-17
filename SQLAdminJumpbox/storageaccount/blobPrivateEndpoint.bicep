@@ -6,12 +6,16 @@ param blobStorageAccountFQDN string
 param blobPrivateDnsZoneId string
 param privateDnsZoneConfigName string = 'privatelink-blob-core-windows-net'
 
+@description('Tags for deployed resources.')
+param Tags object = {}
+
 var blobStorageAccountPrivateEndpointGroupName = 'blob'
 
 // Create the private endpoint
 resource createBlobPrivateEndpoint 'Microsoft.Network/privateEndpoints@2021-03-01' = {
   name: blobStorageAccountPrivateEndpointName
   location: location
+  tags: Tags
   properties: {
     privateLinkServiceConnections: [
       {

@@ -5,10 +5,16 @@ param vmSize string = 'Standard_B2ms'
 param osDiskType string = 'StandardSSD_LRS'
 param adminUsername string = 'adm.infra.usr'
 @secure()
-param adminPassword string = 'p@leClass75t@llPear83'
+param adminPassword string = 'P${uniqueString(newGuid())}x%'
+param storeAdminPasswordInKeyVault bool = false
+param sqlAdminKeyVaultName string
+//param sqlAdminPassword string = 'P${uniqueString(resourceGroup().id)}-${uniqueString(subscription().id)}x!'
 param patchMode string = 'AutomaticByOS'
 param autoShutdownTimeZone string = 'US Mountain Standard Time'
 param autoShutdownNotificationLocale string = 'en'
+
+@description('Tags for deployed resources.')
+param Tags object = {}
 
 var nsgName = '${vmName}-nsg'
 var nsgRules = [
@@ -33,6 +39,7 @@ var nicName = '${vmName}-nic'
 resource nic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
   name: nicName
   location: location
+  tags: Tags
   dependsOn: []
   properties: {
     ipConfigurations: [
@@ -49,10 +56,24 @@ resource nic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
   }
 }
 
+// Store the Sql Admin Password in Key Vault
+// The individual deploying this ARM template must be an Owner or User Access Administrator over the Subscription
+// in order to create a key within the key vault.
+resource createAdminPasswordSecret 'Microsoft.KeyVault/vaults/secrets@2021-06-01-preview' = if (storeAdminPasswordInKeyVault) {
+  name: '${sqlAdminKeyVaultName}/${vmName}'
+  tags: Tags
+  properties: {
+    attributes: {}
+    contentType: '${vmName} Sql Admin Password'
+    value: adminPassword
+  }  
+}
+
 // Create the SQL Admin Jumpbox VM(s)
 resource createSqlAdminJumpboxVM 'Microsoft.Compute/virtualMachines@2021-03-01' = {
   name: vmName
   location: location
+  tags: Tags
   properties: {
     hardwareProfile: {
       vmSize: vmSize
@@ -104,6 +125,7 @@ output adminUsername string = adminUsername
 resource shutdownVM 'Microsoft.DevTestLab/schedules@2018-09-15' = {
   name: 'shutdown-computevm-${vmName}'
   location: location
+  tags: Tags
   properties: {
     status: 'Enabled'
     taskType: 'ComputeVmShutdownTask'
@@ -124,6 +146,7 @@ resource shutdownVM 'Microsoft.DevTestLab/schedules@2018-09-15' = {
 resource cseInstallSMSS 'Microsoft.Compute/virtualMachines/extensions@2021-03-01' = {
   name: '${vmName}/InstallSSMS'
   location: location
+  tags: Tags
   dependsOn: [
     createSqlAdminJumpboxVM
   ]

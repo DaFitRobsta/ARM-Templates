@@ -7,6 +7,45 @@
         },
         "numberOfVMs": {
             "value": 2
+        },
+        "vnetName": {
+            "value": "nz-wu3-sqlAdmins-vnet01"
+        },
+        "vnetAddressPrefix": {
+            "value": "172.16.0.0/24"
+        },
+        "vnetJumpboxSubnetName": {
+            "value": "sql-jumpboxes-sn"
+        },
+        "vnetPrivateEndpointSubnetName": {
+            "value": "private-endpoints-sn"
+        },
+        "setSubnetServiceEndpoints": {
+            "value": true
+        },
+        "sqlAdminKeyVaultSkuName": {
+            "value": "standard"
+        },
+        "bastionHostName": {
+            "value": "sqlAdminBastion"
+        },
+        "clientIPcidr": {
+            "value": [
+                "134.114.0.0/16",
+                "8.8.8.8"
+            ]
+        },
+        "adminUsername": {
+            "value": "adm.infra.usr"
+        },
+        "storeAdminPasswordInKeyVault": {
+            "value": true
+        },
+        "Tags": {
+            "value": {
+                    "Environment": "Dev",
+                    "Project": "Demo"
+                }
         }
     }
 }

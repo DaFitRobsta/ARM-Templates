@@ -27,12 +27,16 @@ param bastionHostName string
 @description('Azure region for Bastion and virtual network')
 param location string = resourceGroup().location
 
+@description('Tags for deployed resources.')
+param Tags object = {}
+
 var publicIpAddressName = '${bastionHostName}-pip'
 var bastionSubnetName = 'AzureBastionSubnet'
 
 resource publicIp 'Microsoft.Network/publicIPAddresses@2021-03-01' = {
   name: publicIpAddressName
   location: location
+  tags: Tags
   sku: {
     name: 'Standard'
   }
@@ -45,6 +49,7 @@ resource publicIp 'Microsoft.Network/publicIPAddresses@2021-03-01' = {
 resource newVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = if (vnetNewOrExisting == 'new') {
   name: vnetName
   location: location
+  tags: Tags
   properties: {
     addressSpace: {
       addressPrefixes: [
@@ -82,6 +87,7 @@ resource privateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-0
 resource bastionHost 'Microsoft.Network/bastionHosts@2021-03-01' = {
   name: bastionHostName
   location: location
+  tags: Tags
   dependsOn: [
     newVirtualNetwork
     existingVirtualNetwork
