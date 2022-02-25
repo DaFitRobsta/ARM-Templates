@@ -1,0 +1,171 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vngConfig": {
+            "value": {
+                "deployVirtualNetworkGateway": false,
+                "virtualNetworkGatewayName": "vgw-pd-wu1-001",
+                "virtualNetworkGatewaySKU": "VpnGw2",
+                "virtualNetworkGatewayGeneration": "Generation2",
+                "virtualNetworkGatewayType": "Vpn",
+                "virtualNetworkGatewayVpnType": "RouteBased",
+                "virtualNetworkGatewayEnableBGP": true
+            }
+        },
+        "allVnetConfigs": {
+            "value": [
+                {
+                    "resourceGroupName": "rg-network-hub-pd-wu1-001",
+                    "resourceGroupLocation": "westus",
+                    "vnetName": "vnet-hub-pd-wu1-001",
+                    "vnetAddressSpace": "10.0.0.0/22",
+                    "dnsServers": [
+                        "168.63.129.16",
+                        "10.0.0.36"
+                    ],
+                    "peeringOption": "HubToSpoke",
+                    "subnets": [
+                        {
+                            "name": "AzureFirewallSubnet",
+                            "addressPrefix": "10.0.0.0/26",
+                            "serviceEndpoints": []
+                        },
+                        {
+                            "name": "AzureBastionSubnet",
+                            "addressPrefix": "10.0.0.64/26",
+                            "serviceEndpoints": []
+                        },
+                        {
+                            "name": "GatewaySubnet",
+                            "addressPrefix": "10.0.0.128/27",
+                            "serviceEndpoints": []
+                        },
+                        {
+                            "name": "snet-SharedServices",
+                            "addressPrefix": "10.0.0.160/27",
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.KeyVault",
+                                    "locations": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "snet-AppGateway",
+                            "addressPrefix": "10.0.1.0/25",
+                            "serviceEndpoints": []
+                        }
+                    ]
+                },
+                {
+                    "resourceGroupName": "rg-network-app1-pd-wu1-001",
+                    "resourceGroupLocation": "westus",
+                    "vnetName": "vnet-app1-pd-wu1-001",
+                    "vnetAddressSpace": "10.0.4.0/24",
+                    "dnsServers": [
+                        "168.63.129.16",
+                        "10.0.0.36"
+                    ],
+                    "peeringOption": "SpokeToHub",
+                    "subnets": [
+                            {
+                                "name": "snet-AppGateway",
+                                "addressPrefix": "10.0.4.0/25",
+                                "serviceEndpoints": []
+                            },
+                            {
+                                "name": "snet-Data",
+                                "addressPrefix": "10.0.4.128/26",
+                                "serviceEndpoints": [
+                                    {
+                                        "service": "Microsoft.KeyVault",
+                                        "locations": [
+                                            "*"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "snet-App",
+                                "addressPrefix": "10.0.4.192/27",
+                                "serviceEndpoints": [
+                                    {
+                                        "service": "Microsoft.KeyVault",
+                                        "locations": [
+                                            "*"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "snet-Web",
+                                "addressPrefix": "10.0.4.224/27",
+                                "serviceEndpoints": [
+                                    {
+                                        "service": "Microsoft.KeyVault",
+                                        "locations": [
+                                            "*"
+                                        ]
+                                    }
+                                ]
+                            }
+                    ]
+                },
+                {
+                    "resourceGroupName": "rg-network-app2-pd-wu1-001",
+                    "resourceGroupLocation": "westus",
+                    "vnetName": "vnet-app2-pd-wu1-001",
+                    "vnetAddressSpace": "10.0.5.0/24",
+                    "dnsServers": [],
+                    "peeringOption": "SpokeToHub",
+                    "subnets": [
+                            {
+                                "name": "snet-AppGateway",
+                                "addressPrefix": "10.0.5.0/25",
+                                "serviceEndpoints": []
+                            },
+                            {
+                                "name": "snet-AppServiceIntegration",
+                                "addressPrefix": "10.0.5.128/26",
+                                "serviceEndpoints": [
+                                    {
+                                        "service": "Microsoft.KeyVault",
+                                        "locations": [
+                                            "*"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "name": "snet-PrivateEndpoint",
+                                "addressPrefix": "10.0.5.192/27",
+                                "serviceEndpoints": [
+                                    {
+                                        "service": "Microsoft.KeyVault",
+                                        "locations": [
+                                            "*"
+                                        ]
+                                    }
+                                ]                                
+                            }
+                        ]
+                }
+            ]
+        },
+        "Tags": {
+            "value": {
+                    "Environment": "Dev",                    
+                    "ApplicationName": "Sandbox",
+                    "DataClassification": "Level2",
+                    "Division": "ITS",
+                    "FiscalApprover": "Uncle John",
+                    "RegulatoryRequirement": "N/A",
+                    "Routing": "None",
+                    "TechnicalApprover": "Aunt Jane"
+                }
+        }
+    }
+}

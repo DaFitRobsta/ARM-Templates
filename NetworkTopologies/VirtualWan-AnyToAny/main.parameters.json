@@ -1,0 +1,220 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "deployAzureBastion": {
+            "value": false
+        },
+        "vWanConfig": {
+            "value": {
+                "vWanName": "vwan-pd-wu1-001",
+                "vHubName": "vhub-pd-wu1-001",
+                "vHubAddressPrefix": "10.187.64.0/24",
+                "deployErGateway": false,
+                "erGatewayScaleUnit": 1,
+                "deploySecuredHub": false,
+                "deployVpnGateway": false,
+                "vpnGatewayScaleUnit": 1
+            }
+        },
+        "allVnetConfigs": {
+            "value": [
+                {
+                    "vnetName": "vnet-sharedservices-pd-wu1-001",
+                    "vnetAddressSpace": "10.187.65.0/24",
+                    "dnsServers": [],
+                    "peeringOption": "SpokeToHub",
+                    "subnets": [
+                        {
+                            "name": "AzureBastionSubnet",
+                            "addressPrefix": "10.187.65.0/26",
+                            "serviceEndpoints": []
+                        },
+                        {
+                            "name": "snet-SharedServices",
+                            "addressPrefix": "10.187.65.64/26",
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.KeyVault",
+                                    "locations": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "snet-AppGateway",
+                            "addressPrefix": "10.187.65.128/25",
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.Web",
+                                    "locations": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "vnetName": "vnet-sqlmi-pd-wu1-001",
+                    "vnetAddressSpace": "10.187.66.0/24",
+                    "dnsServers": [],
+                    "peeringOption": "SpokeToHub",
+                    "subnets": [
+                        {
+                            "name": "snet-SqlMI",
+                            "addressPrefix": "10.187.66.0/24",
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.KeyVault",
+                                    "locations": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "vnetName": "vnet-gls-stg-wu1-001",
+                    "vnetAddressSpace": "10.187.67.0/25",
+                    "dnsServers": [],
+                    "peeringOption": "SpokeToHub",
+                    "subnets": [
+                        {
+                            "name": "snet-gls-frontend-stg",
+                            "addressPrefix": "10.187.67.0/28",
+                            "serviceEndpoints": []
+                        },
+                        {
+                            "name": "snet-gls-backend-stg",
+                            "addressPrefix": "10.187.67.16/28",
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.KeyVault",
+                                    "locations": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "snet-gls-sql-stg",
+                            "addressPrefix": "10.187.67.32/28",
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.KeyVault",
+                                    "locations": [
+                                        "*"
+                                    ]
+                                }
+                            ]                                
+                        }
+                    ]
+                },
+                {
+                    "vnetName": "vnet-gls-pd-wu1-001",
+                    "vnetAddressSpace": "10.187.67.128/25",
+                    "dnsServers": [],
+                    "peeringOption": "SpokeToHub",
+                    "subnets": [
+                        {
+                            "name": "snet-gls-frontend-pd",
+                            "addressPrefix": "10.187.67.128/28",
+                            "serviceEndpoints": []
+                        },
+                        {
+                            "name": "snet-gls-backend-pd",
+                            "addressPrefix": "10.187.67.144/28",
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.KeyVault",
+                                    "locations": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "snet-gls-sql-pd",
+                            "addressPrefix": "10.187.67.160/28",
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.KeyVault",
+                                    "locations": [
+                                        "*"
+                                    ]
+                                }
+                            ]                                
+                        }
+                    ]
+                },
+                {
+                    "vnetName": "vnet-med-dmz-pd-wu1-001",
+                    "vnetAddressSpace": "10.187.68.0/24",
+                    "dnsServers": [],
+                    "peeringOption": "SpokeToHub",
+                    "subnets": [
+                        {
+                            "name": "snet-med-dmz",
+                            "addressPrefix": "10.187.68.0/26",
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.KeyVault",
+                                    "locations": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "vnetName": "vnet-appgw-pd-wu1-001",
+                    "vnetAddressSpace": "10.187.69.0/24",
+                    "dnsServers": [],
+                    "peeringOption": "SpokeToHub",
+                    "subnets": [
+                        {
+                            "name": "snet-appgw",
+                            "addressPrefix": "10.187.69.0/25",
+                            "serviceEndpoints": [
+                                {
+                                    "service": "Microsoft.Web",
+                                    "locations": [
+                                        "*"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "vnetName": "vnet-med-wvd-pd-wu1-001",
+                    "vnetAddressSpace": "10.187.70.0/24",
+                    "dnsServers": [],
+                    "peeringOption": "SpokeToHub",
+                    "subnets": [
+                        {
+                            "name": "snet-med-wvd",
+                            "addressPrefix": "10.187.70.0/25",
+                            "serviceEndpoints": []
+                        }
+                    ]
+                }                
+            ]
+        },
+        "Tags": {
+            "value": {
+                    "Environment": "Prod",                    
+                    "ApplicationName": "Infrastructure",
+                    "DataClassification": "N/A",
+                    "Division": "ITS",
+                    "FiscalApprover": "John Doe",
+                    "RegulatoryRequirement": "N/A",
+                    "TechnicalApprover": "Jane Stark"
+                }
+        }
+    }
+}
