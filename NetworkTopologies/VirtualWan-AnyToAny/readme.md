@@ -20,6 +20,8 @@ This deployment, in it's default state, will deploy an Any-to-Any Virtual WAN.
     - Define subnet(s) within the VNET
       - Deploys an NSG per subnet with default rules
       - [optional] Declare Service Endpoint(s) per subnet
+- [optional] Azure Bastion
+  - Add Azure Bastion service to any virtual network with AzureBastionSubnet defined and if the parameter to deployAzureBastion is set to **true**
 - Virtual WAN
   - Virtual Hub
     - All VNETs created above will be connected to the hub
