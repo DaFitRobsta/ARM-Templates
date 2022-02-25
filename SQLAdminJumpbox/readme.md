@@ -1,6 +1,7 @@
 # Deploy SQL Admin Jumpbox(es)
 
-## Scenario
+## About
+![SQL Admin Jumpbox architecture](architecture.drawio.png)
 
 ## Prerequisites
 
