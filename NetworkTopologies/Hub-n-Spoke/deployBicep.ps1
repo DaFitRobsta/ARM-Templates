@@ -65,6 +65,6 @@ $bicepFile = '.\main.bicep'
 $mainParametersFiles = $TemplateParameterFile
 New-AzSubscriptionDeployment `
   -Name deployHubandSpoke `
-  -Location  $Location`
+  -Location  $Location `
   -TemplateFile $bicepFile `
   -TemplateParameterFile $mainParametersFiles
