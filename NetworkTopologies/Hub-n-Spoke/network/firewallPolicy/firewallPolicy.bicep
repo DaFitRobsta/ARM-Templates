@@ -89,7 +89,7 @@ param coreSysRulesSourceIPGroups array = []
 @description('Priority of the Core Infrastructrue Rule Collection Group')
 param coreRuleCollectionGroupPriority int = 100
 
-module coreInfrastructureRCG 'RuleGroups/coreInfraRCG.bicep' = if (((!empty(adRulesDestinationAddresses) && empty(adRulesDestinationIPGroups)) || (empty(adRulesDestinationAddresses) && !empty(adRulesDestinationIPGroups))) && ((!empty(adRulesSourceAddresses) && empty(adRulesSourceIPGroups)) || (empty(adRulesSourceAddresses) && !empty(adRulesSourceIPGroups))))  {
+module coreInfrastructureRCG 'RuleGroups/coreInfraRCG.bicep' = {
   name: 'coreInfrastructureRCG'
   params:{
     fwPolicyName: baseFwPolicy.name
@@ -105,6 +105,9 @@ module coreInfrastructureRCG 'RuleGroups/coreInfraRCG.bicep' = if (((!empty(adRu
   }
 }
 
+output afwPolicyId string = baseFwPolicy.id
+
+/*  ***** Not needed unless environment has ServiceNow *****
 @description('Priority of the Asset Rule Collection Group')
 param assetDiscoveryRCGPriority int = 200
 
@@ -135,3 +138,4 @@ module assetRCG 'RuleGroups/assetDiscoveryRCG.bicep' = if (((!empty(snowRulesDes
     coreInfrastructureRCG
   ]
 }
+*/
