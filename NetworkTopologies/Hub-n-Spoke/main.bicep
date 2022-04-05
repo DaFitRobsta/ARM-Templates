@@ -4,6 +4,15 @@ param allVnetConfigs array = []
 @description('Virtual Network Gateway configuration settings')
 param vngConfig object = {}
 
+@description('Local Network Gateway configuration settings')
+param lngConfig object = {}
+
+@description('Azure Firewall configuration settings')
+param afwConfig object = {}
+
+@description('true = deploy bastion, false = no deploy')
+param deployBastion bool
+
 @description('Currently setting all resoruces to the same resource TAGS')
 param tags object = {}
 
@@ -44,8 +53,8 @@ module createVnets 'network/vnet.bicep' = [for vnet in allVnetConfigs: {
 }] 
 
 // Create VPN, ER Gateway, or none
-// iterate through all VNETs until Virtual Network Gateway bool property is found
-module createVirtualNetworkGateway 'network/virtualNetworkGateway.bicep' = [for vnet in allVnetConfigs: if(vnet.peeringOption == 'HubToSpoke') {
+// iterate through all VNETs until we identify the hub net and deploy Virtual Network Gateway bool property is true
+module createVirtualNetworkGateway 'network/virtualNetworkGateway.bicep' = [for vnet in allVnetConfigs: if(vnet.peeringOption == 'HubToSpoke' && vngConfig.deployVirtualNetworkGateway == true) {
   scope: resourceGroup(vnet.resourceGroupName)
   name: 'createVirtualNetworkGateway-${vnet.vnetName}'
   dependsOn: [
@@ -54,14 +63,49 @@ module createVirtualNetworkGateway 'network/virtualNetworkGateway.bicep' = [for 
   params: {
     location: vnet.resourceGroupLocation
     hubVnetResourceGroupName: vnet.resourceGroupName
-    hubVnetName: vnet.vnetName
-    deployVirtualNetworkGateway: vngConfig.deployVirtualNetworkGateway
+    hubVnetName: vnet.vnetName    
     virtualNetworkGatewaySKU: vngConfig.virtualNetworkGatewaySKU
     virtualNetworkGatewayType: vngConfig.virtualNetworkGatewayType
     virtualNetworkGatewayEnableBGP: vngConfig.virtualNetworkGatewayEnableBGP    
     virtualNetworkGatewayGeneration: vngConfig.virtualNetworkGatewayGeneration
     virtualNetworkGatewayVpnType: vngConfig.virtualNetworkGatewayVpnType
-    virtualNetworkGatewayName: vngConfig.virtualNetworkGatewayName    
+    virtualNetworkGatewayName: vngConfig.virtualNetworkGatewayName
+    localNetworkGatewayName: lngConfig.localNetworkGatewayName
+    localGatewayIpAddress: lngConfig.localGatewayIpAddress
+    localNetworkAddressSpace: lngConfig.localNetworkAddressSpace
+    localGatewaySharedKey: lngConfig.localGatewaySharedKey
+    tags: tags   
+  }
+}]
+
+// Create Azure Firewall in Hub virtual network
+// iterate through all VNETs until we identify the hub vnet and deploy azure firewall bool property is true
+module createAzureFirewall 'network/azureFirewall.bicep' = [for vnet in allVnetConfigs: if(vnet.peeringOption == 'HubToSpoke' && afwConfig.deployAzureFirewall == true) {
+  scope: resourceGroup(vnet.resourceGroupName)
+  name: 'createAzureFirewall-${vnet.vnetName}'
+  dependsOn: [
+    createVnets
+  ]
+  params: {
+    location: vnet.resourceGroupLocation
+    azureFirewallName: afwConfig.afwName
+    azureFirewallSkuTier: afwConfig.afwSkuTier
+    vnetName: vnet.vnetName
+    tags: tags   
+  }
+}]
+
+// Create Azure Bastion
+module createAzureBastion 'network/bastion.bicep' = [for vnet in allVnetConfigs: if(vnet.peeringOption == 'HubToSpoke' && deployBastion == true) {
+  scope: resourceGroup(vnet.resourceGroupName)
+  name: 'createAzureBastion-${vnet.vnetName}'
+  dependsOn: [
+    createVnets
+  ]
+  params: {
+    location: vnet.resourceGroupLocation
+    vnetName: vnet.vnetName
+    tags: tags   
   }
 }]
 

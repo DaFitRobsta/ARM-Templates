@@ -1,18 +1,23 @@
 param hubVnetName string
 param hubVnetResourceGroupName string
-param deployVirtualNetworkGateway bool = true
 param virtualNetworkGatewayName string
 param virtualNetworkGatewaySKU string
 param virtualNetworkGatewayGeneration string
 param virtualNetworkGatewayType string
 param virtualNetworkGatewayVpnType string
 param virtualNetworkGatewayEnableBGP bool
+param localNetworkGatewayName string
+param localNetworkAddressSpace array
+param localGatewayIpAddress string
+param localGatewaySharedKey string
+param tags object
 param location string = resourceGroup().location
 
 // Create Public IP address for the gateway
-resource createGwPublicIP 'Microsoft.Network/publicIPAddresses@2021-05-01' = if (deployVirtualNetworkGateway) {
+resource createGwPublicIP 'Microsoft.Network/publicIPAddresses@2021-05-01' = {
   name: 'pip-${virtualNetworkGatewayName}'
   location: location
+  tags: tags
   properties: {
     publicIPAllocationMethod: 'Dynamic'
   }
@@ -24,9 +29,10 @@ resource gatewaySubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' ex
   name: '${hubVnetName}/GatewaySubnet'
 }
 // Create Virtual Network Gateway
-resource createVirtualNetworkGateway 'Microsoft.Network/virtualNetworkGateways@2021-05-01' = if (deployVirtualNetworkGateway) {
+resource createVirtualNetworkGateway 'Microsoft.Network/virtualNetworkGateways@2021-05-01' = {
   name: virtualNetworkGatewayName
   location: location
+  tags: tags
   properties: {
     ipConfigurations: [
       {
@@ -50,5 +56,40 @@ resource createVirtualNetworkGateway 'Microsoft.Network/virtualNetworkGateways@2
     gatewayType: virtualNetworkGatewayType
     vpnType: virtualNetworkGatewayVpnType
     enableBgp: virtualNetworkGatewayEnableBGP
+  }
+}
+
+// Create Local Network Gateway if gateway type == vpn
+resource createLocalNetworkGateway 'Microsoft.Network/localNetworkGateways@2021-05-01' = if (virtualNetworkGatewayType =~ 'vpn') {
+ name: localNetworkGatewayName
+ location: location
+ tags: tags
+ properties: {
+   localNetworkAddressSpace: {
+     addressPrefixes: localNetworkAddressSpace
+   }
+   gatewayIpAddress: localGatewayIpAddress
+ }
+}
+
+// Create connection between Local Network Gateway
+resource createOnPremToAzureVpnGwConnection 'Microsoft.Network/connections@2021-05-01' = if (virtualNetworkGatewayType =~ 'vpn') {
+  name: 'con-${virtualNetworkGatewayName}-to-${localNetworkGatewayName}'
+  location: location
+  tags: tags
+  properties: {
+    connectionType: 'IPsec'
+    virtualNetworkGateway1: {
+      id: createVirtualNetworkGateway.id
+      properties: {
+        
+      }
+    }
+    localNetworkGateway2: {
+      id: createLocalNetworkGateway.id
+      properties: {
+      }
+    }
+    sharedKey: localGatewaySharedKey
   }
 }

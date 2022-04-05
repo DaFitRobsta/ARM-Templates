@@ -47,6 +47,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
 
 output vnetId string = vnet.id
 output vnetName string = vnet.name
+output vnetAddressPrefixes array = vnet.properties.addressSpace.addressPrefixes
 //output subnetProperties array = vnet.properties.subnets
 /* output privateEndpointSubnet array = [for (subnet, index) in subnets: (subnet.name == vnetPrivateEndpointSubnetName) ? {
     subnetName: vnet.properties.subnets[index].name

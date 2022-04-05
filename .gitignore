@@ -8,3 +8,4 @@ SQLServer/main.parameters.airs.json
 SQLServer/main.parameters.airs.aad.json
 AzFirewall/OR-Policies/main.rolight.parameters.json
 AzFirewall/OR-Policies/main.sl.parameters.json
+AzFirewall/Policies/main.mtblife.parameters.json
