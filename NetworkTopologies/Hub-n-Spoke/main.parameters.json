@@ -41,10 +41,7 @@
                     "resourceGroupLocation": "westus3",
                     "vnetName": "vnet-hub-pd-wu3-001",
                     "vnetAddressSpace": "10.200.192.0/23",
-                    "dnsServers": [
-                        "168.63.129.16",
-                        "10.0.0.36"
-                    ],
+                    "dnsServers": [],
                     "peeringOption": "HubToSpoke",
                     "subnets": [
                         {
@@ -86,10 +83,7 @@
                     "resourceGroupLocation": "westus3",
                     "vnetName": "vnet-internal-servers-pd-wu3-001",
                     "vnetAddressSpace": "10.200.194.0/24",
-                    "dnsServers": [
-                        "168.63.129.16",
-                        "10.0.0.36"
-                    ],
+                    "dnsServers": [],
                     "peeringOption": "SpokeToHub",
                     "subnets": [
                         {
