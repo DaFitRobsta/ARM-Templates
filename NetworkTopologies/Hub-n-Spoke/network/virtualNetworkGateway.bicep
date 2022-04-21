@@ -10,6 +10,13 @@ param localNetworkGatewayName string
 param localNetworkAddressSpace array
 param localGatewayIpAddress string
 param localGatewaySharedKey string
+
+@description('Enable Network Platform Diagnostics')
+param enableNetworkPlatformDiagnostics bool
+
+@description('Log Analytics Workspace ID. Used for Diagnostic Settings')
+param lawId string = ''
+
 param tags object
 param location string = resourceGroup().location
 
@@ -91,5 +98,25 @@ resource createOnPremToAzureVpnGwConnection 'Microsoft.Network/connections@2021-
       }
     }
     sharedKey: localGatewaySharedKey
+  }
+}
+
+// Set diagnostic settings
+resource diagVNG 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (enableNetworkPlatformDiagnostics) {
+  name: 'diag-${createVirtualNetworkGateway.name}'
+  scope: createVirtualNetworkGateway
+  properties: {
+    workspaceId: lawId
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        enabled: true
+      }
+    ]
   }
 }

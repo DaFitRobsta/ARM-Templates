@@ -5,11 +5,20 @@ param vnetObj object = {}
 @description('Location for all resources.')
 param location string = resourceGroup().location
 
+@description('Enable Network Platform Diagnostics')
+param enableNetworkPlatformDiagnostics bool
+
+@description('Log Analytics Workspace ID. Used for Diagnostic Settings')
+param lawId string = ''
+
+@description('Storage Account Id used for NSG Flow Logs')
+param nsgStorageAccountId string = ''
+
 @description('Tags for deployed resources.')
 param tags object = {}
 
 // Create the NSGs for each VNET's subnet(s)
-module createNSGs 'nsg.bicep' = [for subnet in vnetObj.subnets: {
+module createNSGs 'nsg.bicep' = [for subnet in vnetObj.subnets: if (!contains(subnet.name, 'AzureFirewallSubnet') && !contains(subnet.name, 'GatewaySubnet')){
   scope: resourceGroup(vnetObj.resourceGroupName)
   name: 'createNSGs-${vnetObj.vnetName}-${subnet.name}'
   params: {
@@ -17,6 +26,9 @@ module createNSGs 'nsg.bicep' = [for subnet in vnetObj.subnets: {
     tags: tags
     subnetProperties: subnet
     vnetName: vnetObj.vnetName
+    enableNetworkPlatformDiagnostics: enableNetworkPlatformDiagnostics
+    lawId: lawId
+    storageAccountId: nsgStorageAccountId
   }
 }] 
 
@@ -42,6 +54,26 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
         //privateEndpointNetworkPolicies: 'Disabled'
       }
     }]
+  }
+}
+
+// Set diagnostic settings
+resource diagVnet 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (enableNetworkPlatformDiagnostics) {
+  name: 'diag-${vnet.name}'
+  scope: vnet
+  properties: {
+    workspaceId: lawId
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        enabled: true
+      }
+    ]
   }
 }
 

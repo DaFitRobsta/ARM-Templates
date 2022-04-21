@@ -4,6 +4,12 @@ param vnetName string
 @description('Azure region for Bastion and virtual network')
 param location string = resourceGroup().location
 
+@description('Enable Network Platform Diagnostics')
+param enableNetworkPlatformDiagnostics bool
+
+@description('Log Analytics Workspace ID. Used for Diagnostic Settings')
+param lawId string = ''
+
 param azureFirewallName string
 
 @description('Basic, Standard, or Premium')
@@ -80,5 +86,25 @@ resource createAzureFirewall 'Microsoft.Network/azureFirewalls@2021-05-01' = {
     firewallPolicy: {
       id: createAzureFirewallPolicy.outputs.afwPolicyId
     }
+  }
+}
+
+// Set diagnostic settings
+resource diagAFW 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (enableNetworkPlatformDiagnostics) {
+  name: 'diag-${createAzureFirewall.name}'
+  scope: createAzureFirewall
+  properties: {
+    workspaceId: lawId
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        enabled: true
+      }
+    ]
   }
 }

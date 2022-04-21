@@ -4,6 +4,12 @@ param vnetName string
 @description('Azure region for Bastion and virtual network')
 param location string = resourceGroup().location
 
+@description('Enable Network Platform Diagnostics')
+param enableNetworkPlatformDiagnostics bool
+
+@description('Log Analytics Workspace ID. Used for Diagnostic Settings')
+param lawId string = ''
+
 @description('Tags for deployed resources.')
 param tags object = {}
 
@@ -47,6 +53,21 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2021-03-01' = {
             id: publicIp.id
           }
         }
+      }
+    ]
+  }
+}
+
+// Set diagnostic settings
+resource diagBastion 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (enableNetworkPlatformDiagnostics) {
+  name: 'diag-${bastionHost.name}'
+  scope: bastionHost
+  properties: {
+    workspaceId: lawId
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
       }
     ]
   }

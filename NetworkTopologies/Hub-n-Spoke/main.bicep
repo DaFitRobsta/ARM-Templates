@@ -13,6 +13,12 @@ param afwConfig object = {}
 @description('true = deploy bastion, false = no deploy')
 param deployBastion bool
 
+@description('Enable Network Platform Diagnostics')
+param enableNetworkPlatformDiagnostics bool
+
+@description('Azure Firewall Workbook definition')
+param afwWorkbookSerializedData string
+
 @description('Currently setting all resoruces to the same resource TAGS')
 param tags object = {}
 
@@ -40,15 +46,43 @@ resource createRGs 'Microsoft.Resources/resourceGroups@2021-04-01' = [for vnet i
   tags: tags
 }]
 
+// Create Log Analytics Workspace for Network Logging
+module createNetworkLAW 'management/logAnalytics.bicep' = [for vnet in allVnetConfigs: if(vnet.peeringOption == 'HubToSpoke' && enableNetworkPlatformDiagnostics) {
+  scope: resourceGroup(vnet.resourceGroupName)
+  name: 'createNetworkLAW-${vnet.resourceGroupName}'
+  dependsOn: createRGs
+  params: {
+    location: vnet.resourceGroupLocation
+    afwWorkbookSerializedData: afwWorkbookSerializedData
+    tags: tags
+  }  
+}]
+
+// Create Storage Account for NSG Flow Logs
+module createNsgStorageAccount 'management/storageaccount.bicep' = [for vnet in allVnetConfigs: if(vnet.peeringOption == 'HubToSpoke' && enableNetworkPlatformDiagnostics) {
+  scope: resourceGroup(vnet.resourceGroupName)
+  name: 'createNsgStorageAccount-${vnet.resourceGroupName}'
+  dependsOn: createRGs
+  params: {
+    location: vnet.resourceGroupLocation    
+    tags: tags
+  }  
+}]
+
 // Create the VNET's and NSGs
 module createVnets 'network/vnet.bicep' = [for vnet in allVnetConfigs: {
   scope: resourceGroup(vnet.resourceGroupName)
-  dependsOn: createRGs
+  dependsOn: [
+    createRGs
+  ]
   name: 'createVnets-${vnet.vnetName}'
   params: {
     location: vnet.resourceGroupLocation
     tags: tags
     vnetObj: vnet
+    enableNetworkPlatformDiagnostics: enableNetworkPlatformDiagnostics
+    lawId: (enableNetworkPlatformDiagnostics==true) ? createNetworkLAW[0].outputs.workspaceId : ''
+    nsgStorageAccountId: (enableNetworkPlatformDiagnostics==true) ? createNsgStorageAccount[0].outputs.storageAccountId : ''
   }
 }] 
 
@@ -74,6 +108,8 @@ module createVirtualNetworkGateway 'network/virtualNetworkGateway.bicep' = [for 
     localGatewayIpAddress: lngConfig.localGatewayIpAddress
     localNetworkAddressSpace: lngConfig.localNetworkAddressSpace
     localGatewaySharedKey: lngConfig.localGatewaySharedKey
+    enableNetworkPlatformDiagnostics: enableNetworkPlatformDiagnostics
+    lawId: (enableNetworkPlatformDiagnostics==false) ? '' : createNetworkLAW[0].outputs.workspaceId
     tags: tags   
   }
 }]
@@ -91,6 +127,8 @@ module createAzureFirewall 'network/azureFirewall.bicep' = [for vnet in allVnetC
     azureFirewallName: afwConfig.afwName
     azureFirewallSkuTier: afwConfig.afwSkuTier
     vnetName: vnet.vnetName
+    enableNetworkPlatformDiagnostics: enableNetworkPlatformDiagnostics
+    lawId: (enableNetworkPlatformDiagnostics==false) ? '' : createNetworkLAW[0].outputs.workspaceId
     tags: tags   
   }
 }]
@@ -105,6 +143,8 @@ module createAzureBastion 'network/bastion.bicep' = [for vnet in allVnetConfigs:
   params: {
     location: vnet.resourceGroupLocation
     vnetName: vnet.vnetName
+    enableNetworkPlatformDiagnostics: enableNetworkPlatformDiagnostics
+    lawId: (enableNetworkPlatformDiagnostics==false) ? '' : createNetworkLAW[0].outputs.workspaceId
     tags: tags   
   }
 }]

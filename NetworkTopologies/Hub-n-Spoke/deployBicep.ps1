@@ -67,4 +67,5 @@ New-AzSubscriptionDeployment `
   -Name deployHubandSpoke `
   -Location  $Location `
   -TemplateFile $bicepFile `
-  -TemplateParameterFile $mainParametersFiles
+  -TemplateParameterFile $mainParametersFiles `
+  -Verbose

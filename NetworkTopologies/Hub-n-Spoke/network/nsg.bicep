@@ -1,7 +1,15 @@
 param location string
 param tags object
 param vnetName string
+@description('Enable Network Platform Diagnostics')
+param enableNetworkPlatformDiagnostics bool
+@description('Log Analytics Workspace ID. Used for Diagnostic Settings')
+param lawId string = ''
+param storageAccountId string = ''
 param subnetProperties object = {}
+@description('Network Watcher Resource Group')
+param networkWatcherResourceGroup string = 'NetworkWatcherRG'
+
 
 var bastionSecurityRules = [
   {
@@ -148,12 +156,41 @@ var bastionSecurityRules = [
   }  
 ]
 
-resource subnetNSG 'Microsoft.Network/networkSecurityGroups@2021-03-01' = if (!contains(subnetProperties.name, 'AzureFirewallSubnet') && !contains(subnetProperties.name, 'GatewaySubnet')) {
+resource subnetNSG 'Microsoft.Network/networkSecurityGroups@2021-03-01' =  {
   name: 'nsg-${vnetName}-${subnetProperties.name}'
   location: location
   tags: tags
   properties: {
     securityRules: (contains(subnetProperties.name, 'Bastion')) ? bastionSecurityRules : []
+  }
+}
+
+// Set diagnostic settings
+resource diagNSG 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (enableNetworkPlatformDiagnostics) {
+  name: 'diag-${subnetNSG.name}'
+  scope: subnetNSG
+  properties: {
+    workspaceId: lawId
+    logs: [
+      {
+        categoryGroup: 'allLogs'
+        enabled: true
+      }
+    ]
+  }
+}
+
+// Setup NSG Flow Logs
+module createNsgFlowLog 'nsgFlowLogs.bicep' = if (enableNetworkPlatformDiagnostics) {
+  name: 'createNsgFlowLog-${subnetNSG.name}'
+  scope: resourceGroup(networkWatcherResourceGroup)
+  params: {
+    location: location
+    subnetNsgId: subnetNSG.id
+    subnetName: subnetNSG.name
+    storageAccountId: storageAccountId
+    lawId: lawId
+    tags: tags
   }
 }
 
