@@ -45,11 +45,21 @@ param (
 
 # Determine if already connected to Azure
 try {
-  $connected = Get-AzSubscription -TenantId $TenantId
+  if($TenantId.length -gt 0){
+    $connected = Get-AzSubscription -TenantId $TenantId
+  }
+  else {
+    $connected = Get-AzSubscription
+  }
 }
 catch {
   Write-Host "Not connected to Azure and you will prompt you to connect to Azure" -ForegroundColor Green
-  $result = Connect-AzAccount -Environment $AzureEnvironment -TenantId $TenantId
+  if($TenantId.length -gt 0){
+    $result = Connect-AzAccount -Environment $AzureEnvironment -TenantId $TenantId
+  }
+  else {
+    $result = Connect-AzAccount -Environment $AzureEnvironment
+  }
 }
 
 $TenantId = (Get-AzContext).Tenant.Id
