@@ -129,3 +129,7 @@ Defines the Virtual Networks and their properties
 |Parameter|Values|
 |------------------------------|-----------------------------------------|
 |Tags|Key Name/Value pair (Environment:Dev)|
+
+## Bug(s)
+
+- If deploying to West US 3, enabling network logging will fail for the NSG Flow logs. Though Microsoft documentation suggests Traffic Analytics, NSG Flow Logs with a Log Analytics Workspace, deployed in West US 3 is supported, ARM deployments typically fail.
