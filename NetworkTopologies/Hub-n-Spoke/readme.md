@@ -20,8 +20,13 @@ This deployment, in it's default state, will deploy a Hub and Spoke network (see
     - Define subnet(s) within the VNET
       - Deploys an NSG per subnet with default rules
       - [optional] Declare Service Endpoint(s) per subnet
+- [optional] Network logging
+  - Enable network diagnostic logging on all network resources and send data to Log Analytics Workspace
 - [optional] Azure Bastion
   - Add Azure Bastion service to any virtual network with AzureBastionSubnet defined and if the parameter to deployAzureBastion is set to **true**
+- [optional] Azure Firewall
+  - If enabled, will be deployed in the Hub Virtual Network
+  - Includes a default Azure Firewall Policy
 - Hub Virtual Network
   - All VNETs created above will be connected to the hub
   - [optional] Add ExpressRoute Gateway to the hub
@@ -63,60 +68,61 @@ The parameters file is how to control what and how many resources are deployed. 
 
 ### Top level properties
 
-|Properties|Values (description)|
-|------------------------------|-----------------------------------------|
-|deployAzureBastion|Deploy Azure Bastion (true,false)|
+|Properties|Type|Description|Default|
+|----------|----|-----------|-------|
+|enableNetworkPlatformDiagnostics|bool|Create a dedicated Log Analytics Workspace to receive all network diagnostic logs|false|
+|deployAzureBastion|bool|Deploy Azure Bastion|false|
 
 ### **afwConfig** (object) Parameter
 
 Defines the properties of the Azure Firewall
-|Properties|Values (description)|
-|------------------------------|-----------------------------------------|
-|deployAzureFirewall|Deploy Azure Firewall (true,false)|
-|afwName|Name of the Azure Firewall|
-|afwSkuTier|Standard or Premium|
+|Properties|Type|Description|Default|Available Values|
+|----------|----|-----------|-------|------|
+|deployAzureFirewall|bool|Deploy Azure Firewall|false||
+|afwName|string|Name of the Azure Firewall|||
+|afwSkuTier|string|Specify which Azure Firewall SKU|Standard|Standard, Premium|
 
 ### **vngConfig** (object) Parameter
 
 Defines the properties of the Virtual Network Gateway
-|Properties|Values (description)|
-|------------------------------|-----------------------------------------|
-|deployVirtualNetworkGateway|Deploy Virtual Network Gateway (true, false)|
-|virtualNetworkGatewayName|Name of the Virtual Network Gateway|
-|virtualNetworkGatewaySKU|Basic, ErGw1AZ, ErGw2AZ, ErGw3AZ, HighPerformance, Standard, UltraPerformance, VpnGw1, VpnGw1AZ, VpnGw2, VpnGw2AZ, VpnGw3, VpnGw3AZ, VpnGw4, VpnGw4AZ, VpnGw5, VpnGw5AZ|
-|virtualNetworkGatewayGeneration| Generation1, Generation2|
-|virtualNetworkGatewayType|ExpressRoute, Vpn|
-|virtualNetworkGatewayVpnType|PolicyBased, RouteBased|
-|virtualNetworkGatewayEnableBGP|true, false|
+|Properties|Type|Description|Default|Available Values|
+|----------|----|-----------|-------|----------------|
+|deployVirtualNetworkGateway|bool|Deploy Virtual Network Gateway|[see template]|true, false|
+|virtualNetworkGatewayName|string|Name of the Virtual Network Gateway|||
+|virtualNetworkGatewaySKU|string|Virtual Network Gateway SKU|[see template]|Basic, ErGw1AZ, ErGw2AZ, ErGw3AZ, HighPerformance, Standard, UltraPerformance, VpnGw1, VpnGw1AZ, VpnGw2, VpnGw2AZ, VpnGw3, VpnGw3AZ, VpnGw4, VpnGw4AZ, VpnGw5, VpnGw5AZ|
+|virtualNetworkGatewayGeneration|string|Virtual Network Gateway Generation|[see template]|Generation1, Generation2|
+|virtualNetworkGatewayType|string|Type of Gateway|[see template]|ExpressRoute, Vpn|
+|virtualNetworkGatewayVpnType|string|Gateway routing type|RouteBased|PolicyBased, RouteBased|
+|virtualNetworkGatewayEnableBGP|bool|Enable BGP on gateway|[see template]|true, false|
 </br>
 
 ### **lngConfig** (object) Parameter
 
 Defines the properties of the Local Network Gateway (on premises device)
-|Properties|Values (description)|
-|------------------------------|-----------------------------------------|
-|localNetworkGatewayName|Name of the Local Network Gateway|
-|localNetworkAddressSpace|An array of IP addresses|
-|bgpSettings|*Not Implemented*|
-|localGatewayIpAddress|IP address of customer device|
-|localGatewaySharedKey|Shared Secret|
+|Properties|Type|Description|Default|Available Values|
+|----------|----|-----------|-------|----------------|
+|localNetworkGatewayName|string|Name of the Local Network Gateway|[see template]||
+|localNetworkAddressSpace|array|An array of IP addresses that are behind this gateway|[see template]||
+|bgpSettings|*Not Implemented*||||
+|localGatewayIpAddress|string|IP address of customer device|[see template]||
+|localGatewaySharedKey|string|Shared Secret|[see template]||
 </br>
 
 ### **allVnetConfigs** (object array of Virtual Network properties) Parameter
 
 Defines the Virtual Networks and their properties
-|Parameters|Values (description)|
-|------------------------------|-----------------------------------------|
-|resourceGroupName|Name of resource group where virtual network will be deployed. (Resource Group created if it doesn't already exists)|
-|resourceGroupLocation|Location of resource group (westus, westus2, westus3, etc.)
-|vnetName|Name of the Virtual Network|
-|vnetAddressSpace|IP Address Space for the Virtual Network|
-|dnsServers|Array of DNS IP address(es)|
-|peeringOption|HubToSpoke, SpokeToHub (default value for all spoke VNETs that will be connected to the hub)|
-|subnets|Array of subnet properties|
-|(subnets) name|Name of subnet|
-|(subnets) addressPrefix|CIDR notation for the subnet's address prefix|
-|(subnets) serviceEndpoints|Array of Service Endpoints|
+|Parameters|Type|Description|Default|Available Values|
+|----------|----|-----------|-------|----------------|
+|resourceGroupName|string|Name of resource group where virtual network will be deployed. (Resource Group created if it doesn't already exists)|||
+|resourceGroupLocation|string|Location of resource group (westus, westus2, westus3, etc.)|||
+|vnetName|string|Name of the Virtual Network|||
+|vnetAddressSpace|string|IP Address Space for the Virtual Network|||
+|dnsServers|array|Array of DNS IP address(es)|||
+|peeringOption|string|Define whether the hub is peering to the spoke or vice versa||HubToSpoke, SpokeToHub|
+|subnets|object|Array of subnet properties|||
+|(subnets) name|string|Name of subnet|||
+|(subnets) addressPrefix|string|CIDR notation for the subnet's address prefix|||
+|(subnets) serviceEndpoints|array|Array of Service Endpoints|||
 
 ### **Tags** (object) Tag Name:Tag Value
 

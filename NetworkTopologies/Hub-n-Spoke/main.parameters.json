@@ -6,7 +6,7 @@
             "value": {
                 "deployAzureFirewall": false,
                 "afwName": "afw-hub-pd-wu3-001",
-                "afwSkuTier": "Standard"
+                "afwSkuTier": "Standard" // allowed values: Standard or Premium
             }
         },
         "enableNetworkPlatformDiagnostics": {
