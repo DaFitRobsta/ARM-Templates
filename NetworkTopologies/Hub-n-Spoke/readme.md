@@ -26,7 +26,9 @@ This deployment, in it's default state, will deploy a Hub and Spoke network (see
   - Add Azure Bastion service to any virtual network with AzureBastionSubnet defined and if the parameter to deployAzureBastion is set to **true**
 - [optional] Azure Firewall
   - If enabled, will be deployed in the Hub Virtual Network
-  - Includes a default Azure Firewall Policy
+  - Includes:
+    - Default Azure Firewall Policy
+    - Azure Firewall Workbook, if Network Logging is enabled
 - Hub Virtual Network
   - All VNETs created above will be connected to the hub
   - [optional] Add ExpressRoute Gateway to the hub
