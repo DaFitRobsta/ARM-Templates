@@ -182,7 +182,7 @@ resource diagNSG 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if
 
 // Setup NSG Flow Logs
 module createNsgFlowLog 'nsgFlowLogs.bicep' = if (enableNetworkPlatformDiagnostics) {
-  name: 'createNsgFlowLog-${subnetNSG.name}'
+  name: 'NsgFlowL-${subnetNSG.name}'
   scope: resourceGroup(networkWatcherResourceGroup)
   params: {
     location: location
