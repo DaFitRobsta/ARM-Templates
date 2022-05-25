@@ -5,7 +5,7 @@
         "afwConfig": {
             "value": {
                 "deployAzureFirewall": false,
-                "afwName": "afw-hub-pd-wu3-001",
+                "afwName": "afw-hub-pd-wu1-001",
                 "afwSkuTier": "Standard" // allowed values: Standard or Premium
             }
         },
@@ -19,7 +19,7 @@
         "vngConfig": {
             "value": {
                 "deployVirtualNetworkGateway": false,
-                "virtualNetworkGatewayName": "vgw-hub-pd-wu3-001",
+                "virtualNetworkGatewayName": "vgw-hub-pd-wu1-001",
                 "virtualNetworkGatewaySKU": "VpnGw2", // allowed values: Basic, ErGw1AZ, ErGw2AZ, ErGw3AZ, HighPerformance, Standard, UltraPerformance, VpnGw1, VpnGw1AZ, VpnGw2, VpnGw2AZ, VpnGw3, VpnGw3AZ, VpnGw4, VpnGw4AZ, VpnGw5, VpnGw5AZ
                 "virtualNetworkGatewayGeneration": "Generation2", // allowed values: Generation1, Generation2, None (if gateway type is NOT VPN)
                 "virtualNetworkGatewayType": "Vpn", // allowed values: ExpressRoute, LocalGateway, Vpn
@@ -29,7 +29,7 @@
         },
         "lngConfig": {
             "value": {
-                "localNetworkGatewayName": "lng-site01-pd-wu3-001",
+                "localNetworkGatewayName": "lng-site01-pd-wu1-001",
                 "localNetworkAddressSpace": [
                     "10.200.17.0/24",
                     "10.200.25.0/24"
@@ -41,9 +41,9 @@
         "allVnetConfigs": {
             "value": [
                 {
-                    "resourceGroupName": "rg-network-hub-pd-wu3-001",
-                    "resourceGroupLocation": "westus3",
-                    "vnetName": "vnet-hub-pd-wu3-001",
+                    "resourceGroupName": "rg-network-hub-pd-wu1-001",
+                    "resourceGroupLocation": "westus",
+                    "vnetName": "vnet-hub-pd-wu1-001",
                     "vnetAddressSpace": "10.200.192.0/23",
                     "dnsServers": [],
                     "peeringOption": "HubToSpoke",
@@ -83,9 +83,9 @@
                     ]
                 },
                 {
-                    "resourceGroupName": "rg-network-internal-pd-wu3-001",
-                    "resourceGroupLocation": "westus3",
-                    "vnetName": "vnet-internal-servers-pd-wu3-001",
+                    "resourceGroupName": "rg-network-internal-pd-wu1-001",
+                    "resourceGroupLocation": "westus",
+                    "vnetName": "vnet-internal-servers-pd-wu1-001",
                     "vnetAddressSpace": "10.200.194.0/24",
                     "dnsServers": [],
                     "peeringOption": "SpokeToHub",
@@ -129,9 +129,9 @@
                     ]
                 },
                 {
-                    "resourceGroupName": "rg-network-dmz-pd-wu3-001",
-                    "resourceGroupLocation": "westus3",
-                    "vnetName": "vnet-dmz-pd-wu3-001",
+                    "resourceGroupName": "rg-network-dmz-pd-wu1-001",
+                    "resourceGroupLocation": "westus",
+                    "vnetName": "vnet-dmz-pd-wu1-001",
                     "vnetAddressSpace": "10.200.195.0/24",
                     "dnsServers": [],
                     "peeringOption": "SpokeToHub",
