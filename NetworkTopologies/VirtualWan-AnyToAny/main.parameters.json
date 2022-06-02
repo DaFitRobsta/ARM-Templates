@@ -13,9 +13,9 @@
                 "deployErGateway": false,
                 "erGatewayScaleUnit": 1,
                 "deploySecuredHub": false,
-                "deployVpnGateway": false,
-                "vpnGatewayScaleUnit": 1,
-                "deploySecuredVirtualHub": true
+                "azureFirewallSkuTier": "Standard",
+                "deployVpnGateway": true,
+                "vpnGatewayScaleUnit": 1
             }
         },
         "allVnetConfigs": {

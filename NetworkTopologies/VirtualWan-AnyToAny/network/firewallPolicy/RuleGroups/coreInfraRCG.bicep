@@ -324,7 +324,16 @@ resource coreInfraRuleCollectionGroups 'Microsoft.Network/firewallPolicies/ruleC
           {
             ruleType: 'ApplicationRule'
             name: 'AllowAzurePaaSServices'
-            protocols:[]
+            protocols:[
+              {
+                port: 80
+                protocolType: 'Http'
+              }
+              {
+                port: 443
+                protocolType: 'Https'
+              }
+            ]
             destinationAddresses: []
             fqdnTags:[
               'WindowsDiagnostics'

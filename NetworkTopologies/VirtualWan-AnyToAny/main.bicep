@@ -10,12 +10,6 @@ param location string = resourceGroup().location
 @description('Deploy Azure Bastion into the AzureBastionSubnet (true or false)')
 param deployAzureBastion bool = false
 
-@description('Deploy Azure Firewall in the Virtual Hub')
-param deploySecuredVirtualHub bool
-
-@description('Basic, Standard, or Premium')
-param azureFirewallSkuTier string = 'Standard'
-
 @description('Currently setting all resoruces to the same resource TAGS')
 param tags object = {}
 
@@ -97,12 +91,12 @@ resource createHubErGateway 'Microsoft.Network/expressRouteGateways@2021-05-01' 
 }
 
 // Create Azure Firewall Policy
-module createAzureFirewallPolicy 'network/firewallPolicy/firewallPolicy.bicep' = if(deploySecuredVirtualHub) {
+module createAzureFirewallPolicy 'network/firewallPolicy/firewallPolicy.bicep' = if(vWanConfig.deploySecuredHub) {
   name: 'createAzureFirewallPolicy'
   scope: resourceGroup()
   params: {
     location: location
-    firewallPolicySku: azureFirewallSkuTier
+    firewallPolicySku: vWanConfig.azureFirewallSkuTier
     adRulesDestinationAddresses: [
       '*'
     ]
@@ -118,13 +112,13 @@ module createAzureFirewallPolicy 'network/firewallPolicy/firewallPolicy.bicep' =
   }
 }
 // Create Secured Hub, aka Azure Firewall
-resource createSecuredHub 'Microsoft.Network/azureFirewalls@2021-08-01' = if (deploySecuredVirtualHub) {
+resource createSecuredHub 'Microsoft.Network/azureFirewalls@2021-08-01' = if (vWanConfig.deploySecuredHub) {
   name: '${createVhub.name}-AFW'
   location: location
   properties: {
     sku: {
       name: 'AZFW_Hub'
-      tier: azureFirewallSkuTier
+      tier: vWanConfig.azureFirewallSkuTier
     }
     hubIPAddresses: {
       publicIPs: {

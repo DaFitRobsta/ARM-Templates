@@ -10,7 +10,7 @@
             }
         },
         "enableNetworkPlatformDiagnostics": {
-            "value": true
+            "value": false
 
         },
         "deployBastion": {
@@ -18,7 +18,7 @@
         },
         "vngConfig": {
             "value": {
-                "deployVirtualNetworkGateway": false,
+                "deployVirtualNetworkGateway": true,
                 "virtualNetworkGatewayName": "vgw-hub-pd-wu1-001",
                 "virtualNetworkGatewaySKU": "VpnGw2", // allowed values: Basic, ErGw1AZ, ErGw2AZ, ErGw3AZ, HighPerformance, Standard, UltraPerformance, VpnGw1, VpnGw1AZ, VpnGw2, VpnGw2AZ, VpnGw3, VpnGw3AZ, VpnGw4, VpnGw4AZ, VpnGw5, VpnGw5AZ
                 "virtualNetworkGatewayGeneration": "Generation2", // allowed values: Generation1, Generation2, None (if gateway type is NOT VPN)
