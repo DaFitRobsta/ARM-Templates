@@ -69,7 +69,19 @@ module createNsgStorageAccount 'management/storageaccount.bicep' = [for vnet in 
   }  
 }]
 
-// Create the VNET's and NSGs
+// Predetermine the Azure Firewall Private IP Address
+module determineAzFirewallPrivateIP 'network/generateFirewallPrivateIP.bicep' = [for vnet in allVnetConfigs: if(vnet.peeringOption == 'HubToSpoke' && afwConfig.routeAllTrafficThroughFirewall) {
+  scope: resourceGroup(vnet.resourceGroupName)
+  name: 'determineAzFirewallPrivateIP-${vnet.vnetName}'
+  dependsOn: [
+    createRGs
+  ]
+  params: {
+    vnetObj: vnet
+  }
+}]
+
+// Create the VNET's, NSGs, and Route Table(s)
 module createVnets 'network/vnet.bicep' = [for vnet in allVnetConfigs: {
   scope: resourceGroup(vnet.resourceGroupName)
   dependsOn: [
@@ -83,6 +95,9 @@ module createVnets 'network/vnet.bicep' = [for vnet in allVnetConfigs: {
     enableNetworkPlatformDiagnostics: enableNetworkPlatformDiagnostics
     lawId: (enableNetworkPlatformDiagnostics==true) ? createNetworkLAW[0].outputs.workspaceId : ''
     nsgStorageAccountId: (enableNetworkPlatformDiagnostics==true) ? createNsgStorageAccount[0].outputs.storageAccountId : ''
+    azFirewallIP: determineAzFirewallPrivateIP[0].outputs.azFirewallPrivateIP
+    allVnetConfigs: allVnetConfigs
+    routeAllTrafficThroughFirewall: afwConfig.routeAllTrafficThroughFirewall
   }
 }] 
 

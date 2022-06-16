@@ -81,6 +81,7 @@ Defines the properties of the Azure Firewall
 |Properties|Type|Description|Default|Available Values|
 |----------|----|-----------|-------|------|
 |deployAzureFirewall|bool|Deploy Azure Firewall|false||
+|routeAllTrafficThroughFirewall|bool|North, South, East, West traffic is routed through the Azure Firewall|true||
 |afwName|string|Name of the Azure Firewall|||
 |afwSkuTier|string|Specify which Azure Firewall SKU|Standard|Standard, Premium|
 
