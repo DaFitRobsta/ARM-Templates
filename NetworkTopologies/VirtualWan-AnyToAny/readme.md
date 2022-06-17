@@ -43,19 +43,19 @@ The steps outlined assumes the deployment is occurring from a workstation config
 Example 1: Deploy to Azure Commercial
 
 ```powershell
-PS C:\repos\ARM\SQLMI> .\deployBicep.ps1
+PS C:\repos\ARM\NetworkTopologies\VirtualWan-AnyToAny> .\deployBicep.ps1
 ```
 
 Example 2: Deploy to Azure Government with a specific parameters file
 
 ```powershell
-PS C:\repos\ARM\SQLMI> .\deployBicep.ps1 -AzureEnvironment AzureUSGovernment -TemplateParameterFile .\main.parameters.gov.json
+PS C:\repos\ARM\NetworkTopologies\VirtualWan-AnyToAny> .\deployBicep.ps1 -AzureEnvironment AzureUSGovernment -TemplateParameterFile .\main.parameters.gov.json
 ```
 
 Example 3: Deploy to Azure Government with a specific parameters file and Azure AD tenant. The use of the TenantId would be in situations where you are a guest user in the tenant the subscription is associated with.
 
 ```powershell
-PS C:\repos\ARM\SQLMI> .\deployBicep.ps1 -AzureEnvironment AzureUSGovernment -TemplateParameterFile .\main.parameters.gov.json -TenantId "xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx"
+PS C:\repos\ARM\NetworkTopologies\VirtualWan-AnyToAny> .\deployBicep.ps1 -AzureEnvironment AzureUSGovernment -TemplateParameterFile .\main.parameters.gov.json -TenantId "xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx"
 ```
 
 ## Parameters File
