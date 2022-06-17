@@ -37,7 +37,7 @@ var spokeRoutes = [
    location: location
    tags: tags
    properties: {
-     disableBgpRoutePropagation: (vnetType == 'HubToSpoke') ? true : false
+     disableBgpRoutePropagation: (vnetType == 'HubToSpoke') ? false : true
      routes: (vnetType == 'HubToSpoke') ? gatewayRoutes : spokeRoutes
    }
  }
