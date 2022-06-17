@@ -12,9 +12,9 @@
                 "vHubAddressPrefix": "10.187.64.0/24",
                 "deployErGateway": false,
                 "erGatewayScaleUnit": 1,
-                "deploySecuredHub": false,
+                "deploySecuredHub": true,
                 "azureFirewallSkuTier": "Standard",
-                "deployVpnGateway": true,
+                "deployVpnGateway": false,
                 "vpnGatewayScaleUnit": 1
             }
         },

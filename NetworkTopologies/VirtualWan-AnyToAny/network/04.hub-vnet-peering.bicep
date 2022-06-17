@@ -6,7 +6,7 @@ param vnet object
 
 
 // Only create hub to spoke peerings
-resource vnetHubPeeringToRemoteVnet 'Microsoft.Network/virtualHubs/hubVirtualNetworkConnections@2021-05-01' = {
+resource vnetHubPeeringToRemoteVnet 'Microsoft.Network/virtualHubs/hubVirtualNetworkConnections@2021-03-01' = {
   name: '${vHubName}/${vnet.vnetName}_connection'
   properties: {
     remoteVirtualNetwork: {

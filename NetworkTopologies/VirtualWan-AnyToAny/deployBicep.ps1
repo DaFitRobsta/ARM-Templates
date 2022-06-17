@@ -78,3 +78,4 @@ New-AzResourceGroupDeployment `
   -ResourceGroupName $resourceGroup `
   -TemplateFile $bicepFile `
   -TemplateParameterFile $mainParametersFiles
+  -Verbose
