@@ -77,5 +77,5 @@ New-AzResourceGroupDeployment `
   -Name deployVirtualWAN `
   -ResourceGroupName $resourceGroup `
   -TemplateFile $bicepFile `
-  -TemplateParameterFile $mainParametersFiles
+  -TemplateParameterFile $mainParametersFiles `
   -Verbose
