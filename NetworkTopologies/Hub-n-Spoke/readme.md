@@ -2,7 +2,7 @@
 
 ## About
 
-This is a traditional networking topology with shared services, firewall, bastion, application gateway, and virtual network gateway subnets defined in the hub. There are two spoke networks in this example; one for internal servers and the other for DMZ workloads.
+This is a traditional networking topology with shared services, firewall, bastion, application gateway, and virtual network gateway subnets defined in the hub. There are three spoke networks in this example; shared services, internal servers and application workloads.
 
 This template was designed with a modular approach where the **main** bicep file orchestrates the creation of all resources and relies on modules for supporting resources, like virtual networks and network security groups. In order to keep this template **dynamic**, the parameters file is used to control what and how many resources are deployed. Near the bottom is an explanation of the parameters file.
 
@@ -11,10 +11,11 @@ This deployment, in it's default state, will deploy a Hub and Spoke network (see
 
 > ## Important
 >
-> All networking resources are deployed in multiple resource groups within a single subscription.
+> All networking resources are deployed in **multiple resource groups** within a **single subscription**.
 
 ## Features
 
+- Utilize the parameters file to define your network design
 - Virtual Network(s)
   - Declare how many VNETs
     - Define subnet(s) within the VNET
@@ -66,7 +67,7 @@ PS C:\repos\ARM\NetworkTopologies\Hub-n-Spoke> .\deployBicep.ps1 -AzureEnvironme
 
 ## Parameters File
 
-The parameters file is how to control what and how many resources are deployed. Review the following parameters in main.parameters.json before deployment:
+The parameters file is how to control what and how many resources are deployed. There are a few examples in the [/parameterFileExamples](parameterFileExamples/) folder on various ways to control what is deployed. Below are the  parameters available in main.parameters.json:
 
 ### Top level properties
 
@@ -132,6 +133,11 @@ Defines the Virtual Networks and their properties
 |Parameter|Values|
 |------------------------------|-----------------------------------------|
 |Tags|Key Name/Value pair (Environment:Dev)|
+
+### **Azure Firewall Workbook** (object)
+|Parameter|Type|Description|
+|---------|----|-----------|
+|afwWorkbookSerializedData|JSON object|Azure Firewall Workbook from [Azure GitHub Repo](https://github.com/Azure/Azure-Network-Security/tree/master/Azure%20Firewall/Workbook%20-%20Azure%20Firewall%20Monitor%20Workbook)
 
 ## Bug(s)
 
