@@ -10,3 +10,6 @@ AzFirewall/OR-Policies/main.rolight.parameters.json
 AzFirewall/OR-Policies/main.sl.parameters.json
 AzFirewall/Policies/main.mtblife.parameters.json
 NetworkTopologies/Hub-n-Spoke/main.adjc.parameters.json
+NetworkTopologies/Hub-n-Spoke/main.parameters.onprem.json
+NetworkTopologies/Hub-n-Spoke/main.parameters.hub.only.json
+NetworkTopologies/Hub-n-Spoke/topology.newfold.drawio.png

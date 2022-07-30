@@ -9,7 +9,7 @@ resource azcidrhost_script 'Microsoft.Resources/deploymentScripts@2020-10-01' = 
   kind: 'AzurePowerShell'
   properties: {
     forceUpdateTag: utcValue
-    azPowerShellVersion: '6.4'
+    azPowerShellVersion: '7.0'
     timeout: 'PT10M'
     arguments: '-addressPrefix \'${addressPrefix}\' -indexes ${ipIndexes}'
     scriptContent: '''

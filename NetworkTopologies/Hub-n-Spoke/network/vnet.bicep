@@ -73,7 +73,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-06-01' = {
       properties: {
         addressPrefix: subnet.addressPrefix
         networkSecurityGroup: ((!contains(subnet.name, 'AzureFirewallSubnet') && (!contains(subnet.name, 'GatewaySubnet'))) ? json('{"id": "${createNSGs[index].outputs.nsgID}"}') : null)
-        routeTable: (((contains(vnetObj.peeringOption, 'HubToSpoke') && contains(subnet.name, 'GatewaySubnet')) || contains(vnetObj.peeringOption, 'SpokeToHub')) ? json('{"id": "${createVnetUDR.outputs.udrID}"}') : null)
+        routeTable: (((routeAllTrafficThroughFirewall==true) && ((contains(vnetObj.peeringOption, 'HubToSpoke') && contains(subnet.name, 'GatewaySubnet')) || contains(vnetObj.peeringOption, 'SpokeToHub'))) ? json('{"id": "${createVnetUDR.outputs.udrID}"}') : null)
         serviceEndpoints: subnet.serviceEndpoints
         //privateEndpointNetworkPolicies: 'Disabled'
       }

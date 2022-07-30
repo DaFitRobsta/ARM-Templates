@@ -95,7 +95,7 @@ module createVnets 'network/vnet.bicep' = [for vnet in allVnetConfigs: {
     enableNetworkPlatformDiagnostics: enableNetworkPlatformDiagnostics
     lawId: (enableNetworkPlatformDiagnostics==true) ? createNetworkLAW[0].outputs.workspaceId : ''
     nsgStorageAccountId: (enableNetworkPlatformDiagnostics==true) ? createNsgStorageAccount[0].outputs.storageAccountId : ''
-    azFirewallIP: determineAzFirewallPrivateIP[0].outputs.azFirewallPrivateIP
+    azFirewallIP: (afwConfig.routeAllTrafficThroughFirewall==true) ? determineAzFirewallPrivateIP[0].outputs.azFirewallPrivateIP : ''
     allVnetConfigs: allVnetConfigs
     routeAllTrafficThroughFirewall: afwConfig.routeAllTrafficThroughFirewall
   }
