@@ -16,27 +16,10 @@ param autoShutdownNotificationLocale string = 'en'
 @description('Tags for deployed resources.')
 param Tags object = {}
 
-var nsgName = '${vmName}-nsg'
-var nsgRules = [
-  {
-    name:'RDP'
-    properties: {
-        priority:300
-        protocol:'Tcp'
-        access:'Allow'
-        direction:'Inbound'
-        sourceAddressPrefix:'*'
-        sourcePortRange:'*'
-        destinationAddressPrefix:'*'
-        destinationPortRange:'3389'
-    }
-  }
-]
-
 var nicName = '${vmName}-nic'
 
 // Create the NIC for the VM
-resource nic 'Microsoft.Network/networkInterfaces@2021-02-01' = {
+resource nic 'Microsoft.Network/networkInterfaces@2022-01-01' = {
   name: nicName
   location: location
   tags: Tags

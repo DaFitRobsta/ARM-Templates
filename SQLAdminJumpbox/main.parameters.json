@@ -6,7 +6,7 @@
             "value": "sqlAdminJmp"
         },
         "numberOfVMs": {
-            "value": 2
+            "value": 1
         },
         "vnetName": {
             "value": "nz-wu3-sqlAdmins-vnet01"

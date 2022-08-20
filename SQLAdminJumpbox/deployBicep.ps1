@@ -77,4 +77,5 @@ New-AzResourceGroupDeployment `
   -Name deploySqlAdminJumpboxes `
   -ResourceGroupName $resourceGroup `
   -TemplateFile $bicepFile `
-  -TemplateParameterFile $mainParametersFiles
+  -TemplateParameterFile $mainParametersFiles `
+  -Verbose

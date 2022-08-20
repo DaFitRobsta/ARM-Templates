@@ -43,12 +43,12 @@ param setSubnetServiceEndpoints bool = true
 param subnets array = [
   {
     name: 'AzureBastionSubnet'
-    addressPrefix: replace(vnetAddressPrefix, '/24', '/27') //'172.16.0.0/27'
+    addressPrefix: replace(vnetAddressPrefix, '/24', '/26') //'172.16.0.0/26'
     nsgName: '${vnetName}-bastion-nsg'
   }
   {
     name: vnetJumpboxSubnetName
-    addressPrefix: '${substring(vnetAddressPrefix, 0, lastIndexOf(vnetAddressPrefix, '.'))}.32/27' //'172.16.0.32/27'
+    addressPrefix: '${substring(vnetAddressPrefix, 0, lastIndexOf(vnetAddressPrefix, '.'))}.192/27' //'172.16.0.192/27'
     nsgName: '${vnetName}-${vnetJumpboxSubnetName}-nsg'
   }
   {
@@ -128,6 +128,7 @@ module createSqlAdminStorageAccount 'storageaccount/storageaccount.bicep' = {
     createVirtualNetwork
   ]
   params: {
+    location: location
     clientIPcidr: clientIPcidr
     storName: storageAccountName
     subnetIDs: [
@@ -154,6 +155,7 @@ module createSqlAdminBlobStorageAccountPrivateEndpoint 'storageaccount/blobPriva
     createVirtualNetwork
   ]
   params: {
+    location: location
     blobPrivateDnsZoneId: blobPrivateDnsZone.id
     blobStorageAccountFQDN: createSqlAdminStorageAccount.outputs.blobStorageAccountFQDN
     blobStorageAccountId: createSqlAdminStorageAccount.outputs.storageAccountId

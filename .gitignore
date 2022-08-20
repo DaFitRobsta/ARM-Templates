@@ -13,3 +13,5 @@ NetworkTopologies/Hub-n-Spoke/main.adjc.parameters.json
 NetworkTopologies/Hub-n-Spoke/main.parameters.onprem.json
 NetworkTopologies/Hub-n-Spoke/main.parameters.hub.only.json
 NetworkTopologies/Hub-n-Spoke/topology.newfold.drawio.png
+NetworkTopologies/VirtualWan-AnyToAny/main.parameters.pe.example.json
+SQLAdminJumpbox/scratchspace.drawio.png

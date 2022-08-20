@@ -18,6 +18,13 @@ param vnetNewOrExisting string = 'existing'
 ])
 param vnetSubnetNewOrExisting string = 'existing'
 
+@description('Azure Bastion SKU')
+@allowed([
+  'Basic'
+  'Standard'
+])
+param bastionSku string = 'Standard'
+
 @description('Bastion subnet IP prefix MUST be within vnet IP prefix address space')
 param bastionSubnetIpPrefix string = '10.1.1.0/27'
 
@@ -67,10 +74,6 @@ resource newVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' = if (
   }
 }
 
-// if vnetNewOrExisting == 'existing', reference an existing vnet and create a new subnet under it
-resource existingVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' existing = if (vnetNewOrExisting == 'existing') {
-  name: vnetName
-}
 resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-03-01' = if (vnetSubnetNewOrExisting == 'new') {
   parent: existingVirtualNetwork
   name: bastionSubnetName
@@ -79,12 +82,17 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-03-01' = if (vne
   }
 }
 
+// if vnetNewOrExisting == 'existing', reference an existing vnet and create a new subnet under it
+resource existingVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-03-01' existing = if (vnetNewOrExisting == 'existing') {
+  name: vnetName
+}
+
 // Reference an existing Azure Bastion Subnet
 resource privateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2021-03-01' existing = if (vnetSubnetNewOrExisting == 'existing'){
   name: '${vnetName}/${bastionSubnetName}'
 }
 
-resource bastionHost 'Microsoft.Network/bastionHosts@2021-03-01' = {
+resource bastionHost 'Microsoft.Network/bastionHosts@2022-01-01' = {
   name: bastionHostName
   location: location
   tags: Tags
@@ -92,6 +100,9 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2021-03-01' = {
     newVirtualNetwork
     existingVirtualNetwork
   ]
+  sku: {
+    name: bastionSku
+  }
   properties: {
     ipConfigurations: [
       {
