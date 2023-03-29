@@ -1,0 +1,85 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "deployAzureBastion": {
+            "value": false
+        },
+        "vWanConfig": {
+            "value": {
+                "vWanName": "vwan-dmo-001",
+                "allowBranchToBranchTraffic": true,
+                "allowVnetToVnetTraffic": true,
+                "type": "Standard"
+            }
+        },
+        "vWanHubs": {
+            "value": [
+                {
+                    "vHubName": "vhub-pd-eu2-001",
+                    "location": "eastus2",
+                    "vHubAddressPrefix": "10.3.0.0/24",
+                    "deployErGateway": false,
+                    "erGatewayScaleUnit": 1,
+                    "deploySecuredHub": false,
+                    "azureFirewallSkuTier": "Standard",
+                    "deployVpnGateway": false,
+                    "vpnGatewayScaleUnit": 1,
+                    "spokeVnets": [
+                        {
+                            "vnetName": "vnet-spoke-pd-eu2-001",
+                            "vnetAddressSpace": "10.3.1.0/24",
+                            "dnsServers": [],
+                            "subnets": [
+                                {
+                                    "name": "snet-Servers",
+                                    "addressPrefix": "10.3.1.0/26",
+                                    "serviceEndpoints": [
+                                        {
+                                            "service": "Microsoft.KeyVault",
+                                            "locations": [
+                                                "*"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ],
+                    "onPremSite": {
+                        "name": "ATL",
+                        "deployVirtualNetworkGateway": true,
+                        "virtualNetworkGatewayName": "vgw-atl-pd-wu1-001",
+                        "virtualNetworkGatewaySKU": "VpnGw2", // allowed values: Basic, ErGw1AZ, ErGw2AZ, ErGw3AZ, HighPerformance, Standard, UltraPerformance, VpnGw1, VpnGw1AZ, VpnGw2, VpnGw2AZ, VpnGw3, VpnGw3AZ, VpnGw4, VpnGw4AZ, VpnGw5, VpnGw5AZ
+                        "virtualNetworkGatewayGeneration": "Generation2", // allowed values: Generation1, Generation2, None (if gateway type is NOT VPN)
+                        "virtualNetworkGatewayType": "Vpn", // allowed values: ExpressRoute, LocalGateway, Vpn
+                        "virtualNetworkGatewayVpnType": "RouteBased",
+                        "virtualNetworkGatewayEnableBGP": true,
+                        "virtualNetworkGatewayASN": 65524,
+                        "vnetName": "vnet-atl-pd-wu1-001",
+                        "vnetAddressSpace": "192.168.3.0/24",
+                        "dnsServers": [],
+                        "subnets": [
+                            {
+                                "name": "GatewaySubnet",
+                                "addressPrefix": "192.168.3.0/26",
+                                "serviceEndpoints": []
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        "Tags": {
+            "value": {
+                    "Environment": "Prod",                    
+                    "ApplicationName": "Infrastructure",
+                    "DataClassification": "N/A",
+                    "Division": "ITS",
+                    "FiscalApprover": "John Doe",
+                    "RegulatoryRequirement": "N/A",
+                    "TechnicalApprover": "Jane Stark"
+                }
+        }
+    }
+}
