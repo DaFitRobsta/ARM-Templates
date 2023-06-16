@@ -27,6 +27,7 @@ This deployment, in it's default state, will deploy an Any-to-Any Virtual WAN.
     - All VNETs created above will be connected to the hub
     - [optional] Add ExpressRoute Gateway to the hub
     - [optional] Add VPN Gateway to the hub
+    - [optional] Add P2S Gateway to the hub
 - Simulated On-Premises Data center
   - Define a single Virtual Network with multiple subnets
   - Define the Virtual Network Gateway S2S resource
@@ -95,6 +96,9 @@ Defines the properties of the Virtual Hub(s)
 |azureFirewallSkuTier|Set the SKU of the Firewall (Standard, Premium)
 |deployVpnGateway|Deploy a Site to Site VPN Gateway in the Virtual Hub (true, false)|
 |vpnGatewayScaleUnit|How many VPN Gateway scale units (1 - 20)|
+|deployP2SGateway|Deploy a Point to Site VPN Gateway in the Virtual Hub (true, false)|
+|p2sGatewayScaleUnit|How many VPN Gateway scale units (1 - 20)|
+|p2sAddressPrefix|P2S Address Pool (172.16.1.0/24)|
 
 #### **spokeVnets** object array Parameter
 

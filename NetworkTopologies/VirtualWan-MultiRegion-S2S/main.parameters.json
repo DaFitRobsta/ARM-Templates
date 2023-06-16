@@ -25,6 +25,9 @@
                     "azureFirewallSkuTier": "Standard",
                     "deployVpnGateway": true,
                     "vpnGatewayScaleUnit": 1,
+                    "deployP2SGateway": true,
+                    "p2sGatewayScaleUnit": 1,
+                    "p2sAddressPrefix": "172.16.1.0/24",
                     "spokeVnets": [
                         {
                             "vnetName": "vnet-spoke-pd-wu1-001",
@@ -109,6 +112,9 @@
                     "azureFirewallSkuTier": "Standard",
                     "deployVpnGateway": true,
                     "vpnGatewayScaleUnit": 1,
+                    "deployP2SGateway": true,
+                    "p2sGatewayScaleUnit": 1,
+                    "p2sAddressPrefix": "172.16.2.0/24",
                     "spokeVnets": [
                         {
                             "vnetName": "vnet-spoke-pd-wu3-001",
@@ -162,6 +168,9 @@
                     "azureFirewallSkuTier": "Standard",
                     "deployVpnGateway": false,
                     "vpnGatewayScaleUnit": 1,
+                    "deployP2SGateway": false,
+                    "p2sGatewayScaleUnit": 1,
+                    "p2sAddressPrefix": "172.16.3.0/24",
                     "spokeVnets": [
                         {
                             "vnetName": "vnet-spoke-pd-eu2-001",
@@ -213,8 +222,11 @@
                     "erGatewayScaleUnit": 1,
                     "deploySecuredHub": false,
                     "azureFirewallSkuTier": "Standard",
-                    "deployVpnGateway": true,
+                    "deployVpnGateway": false,
                     "vpnGatewayScaleUnit": 1,
+                    "deployP2SGateway": false,
+                    "p2sGatewayScaleUnit": 1,
+                    "p2sAddressPrefix": "172.16.4.0/24",
                     "spokeVnets": [
                         {
                             "vnetName": "vnet-spoke-pd-ne2-001",

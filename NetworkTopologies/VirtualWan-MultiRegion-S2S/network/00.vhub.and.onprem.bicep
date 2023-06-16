@@ -76,6 +76,63 @@ resource createHubErGateway 'Microsoft.Network/expressRouteGateways@2021-05-01' 
   }
 }
 
+// Create P2S Gateway in Hub
+// First create the VPN Server Configuration
+var tenantId = subscription().tenantId
+var azureCloud = environment().name
+resource createVPNServerConfiguration 'Microsoft.Network/vpnServerConfigurations@2022-11-01' = if (vWanHubConfig.deployP2SGateway) {
+  name: '${createVhub.name}-P2SConfig'
+  location: varLocation
+  properties: {
+    aadAuthenticationParameters: {
+      aadTenant: '${environment().authentication.loginEndpoint}${tenantId}'
+      aadAudience: azureCloud == 'AzureCloud' ? '41b23e61-6c1e-4545-b367-cd054e0ed4b4' : '51bb15d4-3a4f-4ebf-9dca-40096fe32426' // Azure Public AD or Azure Government AD
+      aadIssuer: 'https://sts.windows.net/${tenantId}/'
+    }
+    vpnProtocols: [
+      'IkeV2'
+      'OpenVPN'
+    ]
+    vpnAuthenticationTypes: [
+      'Certificate'
+      'AAD'
+    ]
+    vpnClientRootCertificates: [
+      {
+        name: '${createVhub.name}-DefaultRootCert'
+        publicCertData: loadTextContent('P2SRootCert.b64')
+      }
+    ]
+  }
+}
+// Second create the P2S Gateway
+resource createP2SGateway 'Microsoft.Network/p2sVpnGateways@2022-07-01' = if (vWanHubConfig.deployP2SGateway) {
+  name: '${createVhub.name}-P2SGw'
+  location: varLocation
+  properties: {
+    vpnGatewayScaleUnit: vWanHubConfig.p2sGatewayScaleUnit
+    virtualHub: {
+      id: createVhub.id
+    }
+    vpnServerConfiguration: {
+      id: createVPNServerConfiguration.id
+    }
+    p2SConnectionConfigurations: [
+      {
+        name: '${createVhub.name}-P2SConnectionConfigDefault'
+        properties: {
+          vpnClientAddressPool: {
+            addressPrefixes: [
+              vWanHubConfig.p2sAddressPrefix
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
+
+
 // Create Azure Firewall Policy
 module createAzureFirewallPolicy 'firewallPolicy/firewallPolicy.bicep' = if (vWanHubConfig.deploySecuredHub) {
   name: 'createAzureFirewallPolicy-${createVhub.name}'
