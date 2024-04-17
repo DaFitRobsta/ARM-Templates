@@ -61,6 +61,12 @@ module createAzureFirewallPolicy 'firewallPolicy/firewallPolicy.bicep' = {
     coreSysRulesSourceAddresses: [
       '*'
     ]
+    snowRulesDestinationAddresses: [
+      '*'
+    ]
+    snowRulesSourceAddresses: [
+      '*'
+    ]
   }
 }
 

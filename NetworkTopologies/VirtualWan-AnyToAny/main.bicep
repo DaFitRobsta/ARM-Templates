@@ -25,7 +25,7 @@ module createVnets 'network/01.vnet.bicep' = [for vnet in allVnetConfigs: {
 }] 
 
 // Create vWAN
-resource createVwan 'Microsoft.Network/virtualWans@2021-05-01' = {
+resource createVwan 'Microsoft.Network/virtualWans@2023-06-01' = {
   name: vWanConfig.vWanName
   location: location
   properties: {
@@ -36,7 +36,7 @@ resource createVwan 'Microsoft.Network/virtualWans@2021-05-01' = {
 }
 
 // Create vHub
-resource createVhub 'Microsoft.Network/virtualHubs@2021-05-01' = {
+resource createVhub 'Microsoft.Network/virtualHubs@2023-06-01' = {
   name: vWanConfig.vHubName
   location: location
   properties: {
@@ -60,7 +60,7 @@ module createHubVnetPeerings 'network/04.hub-vnet-peering.bicep' = [for vnet in 
 }]
 
 // Create VPN Gateway in Hub
-resource createHubVpnGateway 'Microsoft.Network/vpnGateways@2021-05-01' = if (vWanConfig.deployVpnGateway) {
+resource createHubVpnGateway 'Microsoft.Network/vpnGateways@2023-06-01' = if (vWanConfig.deployVpnGateway) {
   name: '${createVhub.name}-S2SVpnGw'
   location: location
   properties: {
@@ -75,7 +75,7 @@ resource createHubVpnGateway 'Microsoft.Network/vpnGateways@2021-05-01' = if (vW
 }
 
 // Create ER Gateway in Hub
-resource createHubErGateway 'Microsoft.Network/expressRouteGateways@2021-05-01' = if (vWanConfig.deployErGateway) {
+resource createHubErGateway 'Microsoft.Network/expressRouteGateways@2023-06-01' = if (vWanConfig.deployErGateway) {
   name: '${createVhub.name}-ErGw'
   location: location
   properties: {
@@ -112,7 +112,7 @@ module createAzureFirewallPolicy 'network/firewallPolicy/firewallPolicy.bicep' =
   }
 }
 // Create Secured Hub, aka Azure Firewall
-resource createSecuredHub 'Microsoft.Network/azureFirewalls@2021-08-01' = if (vWanConfig.deploySecuredHub) {
+resource createSecuredHub 'Microsoft.Network/azureFirewalls@2023-06-01' = if (vWanConfig.deploySecuredHub) {
   name: '${createVhub.name}-AFW'
   location: location
   properties: {

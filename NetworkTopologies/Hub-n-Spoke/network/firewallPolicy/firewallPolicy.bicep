@@ -107,7 +107,7 @@ module coreInfrastructureRCG 'RuleGroups/coreInfraRCG.bicep' = {
 
 output afwPolicyId string = baseFwPolicy.id
 
-/*  ***** Not needed unless environment has ServiceNow *****
+//  ***** Not needed unless environment has ServiceNow *****
 @description('Priority of the Asset Rule Collection Group')
 param assetDiscoveryRCGPriority int = 200
 
@@ -138,4 +138,3 @@ module assetRCG 'RuleGroups/assetDiscoveryRCG.bicep' = if (((!empty(snowRulesDes
     coreInfrastructureRCG
   ]
 }
-*/

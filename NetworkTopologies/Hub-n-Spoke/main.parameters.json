@@ -15,7 +15,7 @@
 
         },
         "deployBastion": {
-            "value": true
+            "value": false
         },
         "vngConfig": {
             "value": {

@@ -134,8 +134,8 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
 
 // Need a reference to an existing subnet to determine if it's already been delegated to SQL MI
 resource subnet 'Microsoft.Network/virtualNetworks/subnets@2020-11-01' existing = {
-  name: '${vnet.name}/${managedInstanceSubnetName}'
-  scope: resourceGroup(vnetResourceGroupName)
+  name: managedInstanceSubnetName
+  parent: vnet
 }
 
 //@description('Admin user password - must be 16-128 characters, must contain 3 of uppercase, lowercase, numbers and non-alphanumeric characters, and cannot contain all or part of the login name')
