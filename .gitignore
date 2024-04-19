@@ -15,3 +15,5 @@ NetworkTopologies/Hub-n-Spoke/main.parameters.hub.only.json
 NetworkTopologies/Hub-n-Spoke/topology.newfold.drawio.png
 NetworkTopologies/VirtualWan-AnyToAny/main.parameters.pe.example.json
 SQLAdminJumpbox/scratchspace.drawio.png
+NetworkTopologies/VirtualWan-MultiRegion-Spokes/main.parameters.mtb.json
+NetworkTopologies/VirtualWan-MultiRegion-Spokes/main.parameters.trimble.json

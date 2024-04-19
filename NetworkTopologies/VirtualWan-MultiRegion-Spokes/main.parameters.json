@@ -1,0 +1,213 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "deployAzureBastion": {
+            "value": false
+        },
+        "vWanConfig": {
+            "value": {
+                "resourceGroupName": "rg-cis-am-cus-vwan-001",
+                "resourceGroupLocation": "centralus",
+                "vWanName": "cis-am-cus-vwan-001",
+                "allowBranchToBranchTraffic": true,
+                "allowVnetToVnetTraffic": true,
+                "type": "Standard"
+            }
+        },
+        "vWanHubs": {
+            "value": [
+                {
+                    "vHubName": "vhub-pd-wu1-001",
+                    "location": "westus",
+                    "vHubAddressPrefix": "10.1.0.0/24",
+                    "deployErGateway": false,
+                    "erGatewayScaleUnit": 1,
+                    "deploySecuredHub": false,
+                    "azureFirewallSkuTier": "Standard",
+                    "deployVpnGateway": false,
+                    "vpnGatewayScaleUnit": 1,
+                    "deployP2SGateway": false,
+                    "p2sGatewayScaleUnit": 1,
+                    "p2sAddressPrefix": "172.16.1.0/24",
+                    "spokeVnets": [
+                        {
+                            "subscriptionId": "00000000-0000-0000-0000-000000000000",
+                            "resourceGroupName": "rg-network-hub-pd-wu1-001",
+                            "resourceGroupLocation": "westus",
+                            "vnetName": "vnet-spoke-pd-wu1-001",
+                            "vnetAddressSpace": "10.1.1.0/24",
+                            "dnsServers": [],
+                            "subnets": [
+                                {
+                                    "name": "snet-frontendServers",
+                                    "addressPrefix": "10.1.1.0/26",
+                                    "serviceEndpoints": []
+                                },
+                                {
+                                    "name": "snet-backendServers",
+                                    "addressPrefix": "10.1.1.64/26",
+                                    "serviceEndpoints": [
+                                        {
+                                            "service": "Microsoft.KeyVault",
+                                            "locations": [
+                                                "*"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "subscriptionId": "00000000-0000-0000-0000-000000000000",
+                            "resourceGroupName": "rg-network-hub-pd-wu1-001",
+                            "resourceGroupLocation": "westus",
+                            "vnetName": "vnet-spoke-pd-wu1-002",
+                            "vnetAddressSpace": "10.1.2.0/24",
+                            "dnsServers": [],
+                            "subnets": [
+                                {
+                                    "name": "snet-Servers",
+                                    "addressPrefix": "10.1.2.0/26",
+                                    "serviceEndpoints": [
+                                        {
+                                            "service": "Microsoft.KeyVault",
+                                            "locations": [
+                                                "*"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "vHubName": "vhub-pd-wu3-001",
+                    "location": "westus3",
+                    "vHubAddressPrefix": "10.2.0.0/24",
+                    "deployErGateway": false,
+                    "erGatewayScaleUnit": 1,
+                    "deploySecuredHub": false,
+                    "azureFirewallSkuTier": "Standard",
+                    "deployVpnGateway": false,
+                    "vpnGatewayScaleUnit": 1,
+                    "deployP2SGateway": false,
+                    "p2sGatewayScaleUnit": 1,
+                    "p2sAddressPrefix": "172.16.2.0/24",
+                    "spokeVnets": [
+                        {
+                            "subscriptionId": "00000000-0000-0000-0000-000000000000",
+                            "resourceGroupName": "rg-network-hub-pd-wu1-001",
+                            "resourceGroupLocation": "westus",
+                            "vnetName": "vnet-spoke-pd-wu3-001",
+                            "vnetAddressSpace": "10.2.1.0/24",
+                            "dnsServers": [],
+                            "subnets": [
+                                {
+                                    "name": "snet-Servers",
+                                    "addressPrefix": "10.2.1.0/26",
+                                    "serviceEndpoints": [
+                                        {
+                                            "service": "Microsoft.KeyVault",
+                                            "locations": [
+                                                "*"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "vHubName": "vhub-pd-eu2-001",
+                    "location": "eastus2",
+                    "vHubAddressPrefix": "10.3.0.0/24",
+                    "deployErGateway": false,
+                    "erGatewayScaleUnit": 1,
+                    "deploySecuredHub": false,
+                    "azureFirewallSkuTier": "Standard",
+                    "deployVpnGateway": false,
+                    "vpnGatewayScaleUnit": 1,
+                    "deployP2SGateway": false,
+                    "p2sGatewayScaleUnit": 1,
+                    "p2sAddressPrefix": "172.16.3.0/24",
+                    "spokeVnets": [
+                        {
+                            "subscriptionId": "00000000-0000-0000-0000-000000000000",
+                            "resourceGroupName": "rg-network-hub-pd-wu1-001",
+                            "resourceGroupLocation": "westus",
+                            "vnetName": "vnet-spoke-pd-eu2-001",
+                            "vnetAddressSpace": "10.3.1.0/24",
+                            "dnsServers": [],
+                            "subnets": [
+                                {
+                                    "name": "snet-Servers",
+                                    "addressPrefix": "10.3.1.0/26",
+                                    "serviceEndpoints": [
+                                        {
+                                            "service": "Microsoft.KeyVault",
+                                            "locations": [
+                                                "*"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "vHubName": "vhub-pd-ne1-001",
+                    "location": "northeurope",
+                    "vHubAddressPrefix": "10.4.0.0/24",
+                    "deployErGateway": false,
+                    "erGatewayScaleUnit": 1,
+                    "deploySecuredHub": false,
+                    "azureFirewallSkuTier": "Standard",
+                    "deployVpnGateway": false,
+                    "vpnGatewayScaleUnit": 1,
+                    "deployP2SGateway": false,
+                    "p2sGatewayScaleUnit": 1,
+                    "p2sAddressPrefix": "172.16.4.0/24",
+                    "spokeVnets": [
+                        {
+                            "subscriptionId": "00000000-0000-0000-0000-000000000000",
+                            "resourceGroupName": "rg-network-hub-pd-wu1-001",
+                            "resourceGroupLocation": "westus",
+                            "vnetName": "vnet-spoke-pd-ne2-001",
+                            "vnetAddressSpace": "10.4.1.0/24",
+                            "dnsServers": [],
+                            "subnets": [
+                                {
+                                    "name": "snet-Servers",
+                                    "addressPrefix": "10.4.1.0/26",
+                                    "serviceEndpoints": [
+                                        {
+                                            "service": "Microsoft.KeyVault",
+                                            "locations": [
+                                                "*"
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }                
+            ]
+        },
+        "Tags": {
+            "value": {
+                    "Environment": "Prod",                    
+                    "ApplicationName": "Infrastructure",
+                    "DataClassification": "N/A",
+                    "Division": "ITS",
+                    "FiscalApprover": "John Doe",
+                    "RegulatoryRequirement": "N/A",
+                    "TechnicalApprover": "Jane Stark"
+                }
+        }
+    }
+}
