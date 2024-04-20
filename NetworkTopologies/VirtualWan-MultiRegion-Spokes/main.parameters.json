@@ -36,7 +36,10 @@
                             "resourceGroupName": "rg-network-hub-pd-wu1-001",
                             "resourceGroupLocation": "westus",
                             "vnetName": "vnet-spoke-pd-wu1-001",
-                            "vnetAddressSpace": "10.1.1.0/24",
+                            "vnetAddressSpace": [
+                                "10.1.1.0/24",
+                                "10.60.1.0/24"
+                            ],
                             "dnsServers": [],
                             "subnets": [
                                 {
@@ -63,7 +66,7 @@
                             "resourceGroupName": "rg-network-hub-pd-wu1-001",
                             "resourceGroupLocation": "westus",
                             "vnetName": "vnet-spoke-pd-wu1-002",
-                            "vnetAddressSpace": "10.1.2.0/24",
+                            "vnetAddressSpace": ["10.1.2.0/24"],
                             "dnsServers": [],
                             "subnets": [
                                 {
@@ -101,7 +104,7 @@
                             "resourceGroupName": "rg-network-hub-pd-wu1-001",
                             "resourceGroupLocation": "westus",
                             "vnetName": "vnet-spoke-pd-wu3-001",
-                            "vnetAddressSpace": "10.2.1.0/24",
+                            "vnetAddressSpace": ["10.2.1.0/24"],
                             "dnsServers": [],
                             "subnets": [
                                 {
@@ -139,7 +142,7 @@
                             "resourceGroupName": "rg-network-hub-pd-wu1-001",
                             "resourceGroupLocation": "westus",
                             "vnetName": "vnet-spoke-pd-eu2-001",
-                            "vnetAddressSpace": "10.3.1.0/24",
+                            "vnetAddressSpace": ["10.3.1.0/24"],
                             "dnsServers": [],
                             "subnets": [
                                 {
@@ -177,7 +180,7 @@
                             "resourceGroupName": "rg-network-hub-pd-wu1-001",
                             "resourceGroupLocation": "westus",
                             "vnetName": "vnet-spoke-pd-ne2-001",
-                            "vnetAddressSpace": "10.4.1.0/24",
+                            "vnetAddressSpace": ["10.4.1.0/24"],
                             "dnsServers": [],
                             "subnets": [
                                 {

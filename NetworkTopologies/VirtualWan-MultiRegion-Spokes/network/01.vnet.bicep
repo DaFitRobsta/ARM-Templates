@@ -28,9 +28,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-09-01' = {
   tags: tags
   properties: {
     addressSpace: {
-      addressPrefixes: [
-        vnetObj.vnetAddressSpace
-      ]
+      addressPrefixes: vnetObj.vnetAddressSpace
     }
     dhcpOptions: {
       dnsServers: empty(vnetObj.dnsServers) ? [] : vnetObj.dnsServers

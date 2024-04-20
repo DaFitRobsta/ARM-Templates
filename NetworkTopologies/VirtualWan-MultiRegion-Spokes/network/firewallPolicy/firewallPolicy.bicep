@@ -37,7 +37,7 @@ param fwPolicyPrivateIPAddresses array = [
   '100.64.0.0/10'
 ]
 
-resource baseFwPolicy 'Microsoft.Network/firewallPolicies@2020-11-01' = {
+resource baseFwPolicy 'Microsoft.Network/firewallPolicies@2023-09-01' = {
   name: policyName
   location: location
   tags: {}
@@ -90,7 +90,7 @@ param coreSysRulesSourceIPGroups array = []
 param coreRuleCollectionGroupPriority int = 100
 
 module coreInfrastructureRCG 'RuleGroups/coreInfraRCG.bicep' = {
-  name: 'coreInfrastructureRCG'
+  name: 'coreInfrastructureRCG-${policyName}'
   params:{
     fwPolicyName: baseFwPolicy.name
     adRulesDestinationAddresses: empty(adRulesDestinationAddresses) ? [] : adRulesDestinationAddresses

@@ -5,7 +5,7 @@ param hubSpokes array = []
 param tags object
 
 module vNetResourceGroups 'br/public:avm/res/resources/resource-group:0.2.3' = [for spoke in hubSpokes : {
-  name: 'resourceGroupDeployment-${spoke.resourceGroupName}'
+  name: '${spoke.resourceGroupName}-${uniqueString(spoke.vnetName)}'
   scope: subscription(spoke.subscriptionId)
   params: {
     name: spoke.resourceGroupName

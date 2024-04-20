@@ -18,7 +18,7 @@ param snowRulesSourceIPGroups array = []
 
 var snowDiscoveryRulesPriority = assetDiscoveryRCGPriority
 
-resource snowDiscoveryRuleCollectionGroups 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2021-02-01' = {
+resource snowDiscoveryRuleCollectionGroups 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2023-09-01' = {
   name: '${fwPolicyName}/AssetDiscoveryRCG'
   properties: {
     priority: assetDiscoveryRCGPriority

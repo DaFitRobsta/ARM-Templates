@@ -37,7 +37,7 @@ var coreSystemsApplicationRulesPriority = coreSystemsRulesPriority + 5
 // Get the environment storage blob URI
 var blobStorage = '*.blob.${environment().suffixes.storage}'
 
-resource coreInfraRuleCollectionGroups 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2020-11-01' = {
+resource coreInfraRuleCollectionGroups 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2023-09-01' = {
   name: '${fwPolicyName}/CoreInfrastructureRCG'
   properties:{
     priority: coreRuleCollectionGroupPriority
