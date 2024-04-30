@@ -11,16 +11,15 @@ param deployAzureBastion bool = false
 @description('Tags for deployed resources.')
 param tags object = {}
 
-// Create the NSGs for each VNET's subnet(s)
-module createNSGs '02.nsg.bicep' = [for subnet in vnetObj.subnets: {
-  name: 'createNSG-${vnetObj.vnetName}-${subnet.name}'
+// Create a single NSG for each VNET
+module createNSGs '02.nsg.bicep' = {
+  name: 'createNSG-${vnetObj.vnetName}'
   params: {
     location: location
     tags: tags
-    subnetProperties: subnet
-    //vnetName: vnetObj.vnetName
+    vnetObject: vnetObj
   }
-}] 
+}
 
 resource vnet 'Microsoft.Network/virtualNetworks@2023-09-01' = {
   name: vnetObj.vnetName
@@ -37,7 +36,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-09-01' = {
       name: subnet.name
       properties: {
         addressPrefix: subnet.addressPrefix
-        networkSecurityGroup: ((!contains(subnet.name, 'AzureFirewallSubnet') && (!contains(subnet.name, 'GatewaySubnet'))) ? json('{"id": "${createNSGs[index].outputs.nsgID}"}') : null)
+        networkSecurityGroup: ((!contains(subnet.name, 'AzureFirewallSubnet') && (!contains(subnet.name, 'GatewaySubnet'))) ? json('{"id": "${createNSGs.outputs.nsgID}"}') : null)
         serviceEndpoints: (!empty(subnet.serviceEndpoints)) ? subnet.serviceEndpoints : []
         //privateEndpointNetworkPolicies: 'Disabled'
       }

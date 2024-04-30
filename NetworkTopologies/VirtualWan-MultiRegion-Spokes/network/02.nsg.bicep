@@ -1,9 +1,9 @@
 param location string
 param tags object
 //param vnetName string
-param subnetProperties object = {}
+param vnetObject object = {}
 
-var bastionSecurityRules = [
+/* var bastionSecurityRules = [
   {
     name: 'AllowHttpsInBound'
     properties: {
@@ -146,14 +146,16 @@ var bastionSecurityRules = [
       direction: 'Outbound'
     }
   }  
-]
+] */
 
-resource subnetNSG 'Microsoft.Network/networkSecurityGroups@2023-09-01' = if (!contains(subnetProperties.name, 'AzureFirewallSubnet') && !contains(subnetProperties.name, 'GatewaySubnet')) {
-  name: 'nsg-${subnetProperties.name}'
+var securityRules = contains(vnetObject, 'nsgSecurityRules') ? vnetObject.nsgSecurityRules : []
+
+resource subnetNSG 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
+  name: 'nsg-${vnetObject.vnetName}'
   location: location
   tags: tags
   properties: {
-    securityRules: (contains(subnetProperties.name, 'Bastion')) ? bastionSecurityRules : []
+    securityRules: securityRules
   }
 }
 
