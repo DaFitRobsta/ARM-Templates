@@ -12,5 +12,6 @@ resource vnetHubPeeringToRemoteVnet 'Microsoft.Network/virtualHubs/hubVirtualNet
     remoteVirtualNetwork: {
       id: resourceId(vnet.subscriptionId, vnet.resourceGroupName, 'Microsoft.Network/virtualNetworks', vnet.vnetName)
     }
+    enableInternetSecurity: true
   }
 }

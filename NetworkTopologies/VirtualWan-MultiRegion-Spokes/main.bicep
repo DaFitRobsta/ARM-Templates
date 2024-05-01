@@ -44,6 +44,9 @@ module virtualWan 'br/public:avm/res/network/virtual-wan:0.1.1' = {
 module createVnetResourceGroups 'management/00.resourceGroup.bicep' = [for hub in vWanHubs : {
   name: 'createVnetResourceGroupsConnectedTo-${hub.vHubName}'
   scope: resourceGroup(vWanConfig.resourceGroupName)
+  dependsOn: [
+    createVwanRG
+  ]
   params: {
     hubSpokes: hub.spokeVnets
     tags: tags
