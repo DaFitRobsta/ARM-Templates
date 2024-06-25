@@ -98,6 +98,26 @@
                             "name": "snet-epic-prd-wss-wus3",
                             "addressPrefix": "10.0.10.0/24",
                             "serviceEndpoints": []
+                        },
+                        {
+                            "name": "snet-epic-shared-lbvips-wus3",
+                            "addressPrefix": "10.0.11.0/26",
+                            "serviceEndpoints": []
+                        },
+                        {
+                            "name": "snet-epic-shared-mgmt-wus3",
+                            "addressPrefix": "10.0.11.64/26",
+                            "serviceEndpoints": []
+                        },
+                        {
+                            "name": "snet-epic-shared-sql-wus3",
+                            "addressPrefix": "10.0.11.128/26",
+                            "serviceEndpoints": []
+                        },
+                        {
+                            "name": "snet-epic-shared-nas-wus3",
+                            "addressPrefix": "10.0.11.192/26",
+                            "serviceEndpoints": []
                         }
                     ]
                 },
